@@ -17,6 +17,10 @@
       "PackagePath": "staticwebassets\\css\\dash.css"
     },
     {
+      "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\iaanalysis.css",
+      "PackagePath": "staticwebassets\\css\\iaanalysis.css"
+    },
+    {
       "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },

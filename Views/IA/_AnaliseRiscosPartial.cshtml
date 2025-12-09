@@ -1,0 +1,117 @@
+@using VigiLant.Models
+@model AnaliseRiscoViewModel
+
+<link rel="stylesheet" href="/css/ia-analysis.css" asp-append-version="true" />
+<link rel="stylesheet" href="/css/viewrevo.css" asp-append-version="true" />
+
+<div id="ai-analysis-container">
+    <h4 class="card-title">🤖 Central de Análise de Riscos com IA</h4>
+
+    <form asp-controller="IA" asp-action="ProcessarAnalise" method="post" id="iaAnalysisForm">
+        @Html.AntiForgeryToken()
+
+        <div class="analysis-info-container">
+            <h5 class="card-title">Executar Nova Análise Detalhada</h5>
+            <p>Clique abaixo para que a IA analise <b>todos os riscos</b> registrados e gere um relatório detalhado com
+                sugestões de solução e riscos futuros.</p>
+        </div>
+
+        <div class="form-group mt-4 text-center">
+            <button type="submit" class="btn-primary" style="margin-top: 20px; padding: 10px 20px; font-size: 1.1rem;">
+                <i class="fas fa-microchip"></i> Executar Análise Completa
+            </button>
+        </div>
+    </form>
+
+    <hr class="divider mt-5 mb-5" />
+
+    <h5 class="card-title" style="color: #333;">📑 Histórico de Análises Realizadas (@Model.HistoricoAnalises.Count)
+    </h5>
+
+    @if (!Model.HistoricoAnalises.Any())
+    {
+        <div class="analysis-info-container" style="background-color: #f0f0f0; border-color: #ccc;">
+            <p>Nenhuma análise foi realizada ainda. Clique em "Executar Análise Completa" acima para iniciar.</p>
+        </div>
+    }
+    else
+    {
+        <div class="analysis-history-list">
+            @foreach (var analise in Model.HistoricoAnalises)
+            {
+                // Alterna a classe para destacar o resultado mais recente
+                var containerClass = analise.IsLatest ? "analysis-result-container-latest" :
+                "analysis-result-container-historic";
+
+                <div class="@containerClass mb-4">
+                    <div class="analysis-header">
+                        <h6 class="mb-0" style="font-weight: bold;">
+                            @if (analise.IsLatest)
+                            {
+                                <span class="badge" style="background-color: #52c41a; color: white; margin-right: 5px;">NOVO
+                                    RESULTADO</span>
+                            }
+                            Análise de @analise.DataAnalise.ToString("dd/MM/yyyy HH:mm")
+                        </h6>
+                        <small>Riscos: @analise.RiscosAnalisadosCount | Equipamentos:
+                            @analise.EquipamentosAnalisadosCount</small>
+                    </div>
+
+                    <div class="analysis-body mt-3">
+                        <p>@Html.Raw(analise.Resumo)</p>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>💡 Sugestões de Solução (@analise.SugestoesSolucao.Count):</strong>
+                                <ul>
+                                    @foreach (var sugestao in analise.SugestoesSolucao.Take(3))
+                                    {
+                                        <li>@sugestao</li>
+                                    }
+                                    @if (analise.SugestoesSolucao.Count > 3)
+                                    {
+                                        <li style="font-style: italic;">... e mais @(analise.SugestoesSolucao.Count - 3) sugestões.
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong><br>🚨 Futuros Riscos Potenciais (@analise.NovosRiscosSugeridos.Count):</strong>
+                                <ul>
+                                    @foreach (var risco in analise.NovosRiscosSugeridos.Take(3))
+                                    {
+                                        <li>@risco</li>
+                                    }
+                                    @if (analise.NovosRiscosSugeridos.Count > 3)
+                                    {
+                                        <li style="font-style: italic;">... e mais @(analise.NovosRiscosSugeridos.Count - 3) riscos
+                                            potenciais.</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="divider mt-5 mb-5" style="margin-bottom: 16px"/>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="form-group mt-4 text-end">
+        <button type="button" class="btn-secondary" id="cancelModalButton">
+            <i class="fas fa-arrow-left"></i> Fechar Central
+        </button>
+    </div>
+</div>
+
+<script>
+    // Script para reativar a validação do lado do cliente (Unobtrusive Validation)
+    if (window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive) {
+        var form = document.getElementById('iaAnalysisForm');
+        if (form) {
+            jQuery(form).removeData('validator');
+            jQuery(form).removeData('unobtrusiveValidation');
+            jQuery.validator.unobtrusive.parse(form);
+        }
+    }
+</script>

@@ -21,8 +21,8 @@ const closeModalButton = document.getElementById('closeModalButton');
 
 function openModal(title) {
     modalTitle.textContent = title;
-    modalOverlay.classList.add('show'); 
-    document.body.style.overflow = 'hidden'; 
+    modalOverlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
@@ -31,39 +31,39 @@ function closeModal() {
     setTimeout(() => {
         modalBody.innerHTML = '';
         document.body.style.overflow = '';
-    }, 300); 
+    }, 300);
 }
 
 function loadPartialView(url, method, title, formId) {
     // 1. Mostrar loading e abrir a modal com o título correto
     modalBody.innerHTML = '<div style="text-align: center; padding: 50px;">Carregando...</div>';
     openModal(title);
-    
+
     // 2. Requisição AJAX
     fetch(url, {
         method: method,
         headers: {
-            'X-Requested-With': 'XMLHttpRequest' 
+            'X-Requested-With': 'XMLHttpRequest'
         }
     })
-    .then(response => {
-        // Trata erro de Validação (400) no Controller, permitindo que a Partial View seja lida
-        if (!response.ok && response.status !== 400) {
-            throw new Error(`Erro ${response.status}: ${response.statusText}`);
-        }
-        return response.text();
-    })
-    .then(html => {
-        modalBody.innerHTML = html;
-        
-        // 3. Re-bind dos listeners e validação, passando o ID do formulário
-        bindModalEventListeners(formId);
-    })
-    .catch(error => {
-        console.error('Erro ao carregar Partial View:', error);
-        modalBody.innerHTML = `<div class="delete-message">Ocorreu um erro ao carregar o conteúdo: ${error.message}</div>`;
-        modalTitle.textContent = 'Erro de Carregamento'; 
-    });
+        .then(response => {
+            // Trata erro de Validação (400) no Controller, permitindo que a Partial View seja lida
+            if (!response.ok && response.status !== 400) {
+                throw new Error(`Erro ${response.status}: ${response.statusText}`);
+            }
+            return response.text();
+        })
+        .then(html => {
+            modalBody.innerHTML = html;
+
+            // 3. Re-bind dos listeners e validação, passando o ID do formulário
+            bindModalEventListeners(formId);
+        })
+        .catch(error => {
+            console.error('Erro ao carregar Partial View:', error);
+            modalBody.innerHTML = `<div class="delete-message">Ocorreu um erro ao carregar o conteúdo: ${error.message}</div>`;
+            modalTitle.textContent = 'Erro de Carregamento';
+        });
 }
 
 
@@ -80,7 +80,7 @@ function handleFormSubmission(formId) {
     if (form.currentSubmitHandler) {
         form.removeEventListener('submit', form.currentSubmitHandler);
     }
-    
+
     // Define o novo handler.
     form.currentSubmitHandler = function (e) {
         e.preventDefault();
@@ -93,7 +93,7 @@ function handleFormSubmission(formId) {
         const formData = new FormData(form);
         const actionUrl = form.getAttribute('action');
         const method = form.getAttribute('method') || 'POST';
-        
+
         // Desabilitar o botão de submit temporariamente para evitar cliques múltiplos
         const submitButton = form.querySelector('button[type="submit"]');
         if (submitButton) {
@@ -109,46 +109,59 @@ function handleFormSubmission(formId) {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => {
-             // Reabilitar o botão de submit em caso de resposta (sucesso ou erro)
-            if (submitButton) {
-                // Restaurar o conteúdo original do botão - é necessário um atributo data-original-html
-                // mas para simplificar, vamos apenas reabilitar
-                submitButton.disabled = false; 
-                // Assumindo que o HTML original está definido no _ConectarEquipamentosPartial.cshtml,
-                // vamos apenas reabilitar o botão aqui, o re-bind 400 corrigirá o HTML.
-            }
-            
-            if (response.ok) {
-                // Sucesso (Status 200/204)
-                closeModal();
-                // Recarrega a página para atualizar a tabela
-                window.location.reload(); 
-            } else if (response.status === 400) {
-                // Erro de Validação (Controller retorna PartialView com ModelState.Errors)
-                return response.text().then(html => {
-                    modalBody.innerHTML = html;
-                    // O re-bind é CRUCIAL após o erro 400. Ele re-analisa o form e re-adiciona o submit handler.
-                    bindModalEventListeners(formId); 
-                    // Removido o alert, pois a validação deve ser exibida no formulário
-                });
-            } else {
-                // Outro erro (500, etc.)
-                throw new Error(`Erro ${response.status}: ${response.statusText}`);
-            }
-        })
-        .catch(error => {
-            console.error('Erro na submissão do formulário:', error);
-            alert(`Erro na submissão: ${error.message}`);
-            // Reabilitar o botão de submit em caso de erro na requisição (ex: falha de rede)
-            if (submitButton) {
-                submitButton.disabled = false;
-                // Para restaurar o ícone original, seria necessário ter salvo o innerHTML original
-                // Exemplo: submitButton.innerHTML = submitButton.getAttribute('data-original-html');
-            }
-        });
+            .then(response => {
+                // Reabilitar o botão de submit em caso de resposta (sucesso ou erro)
+                if (submitButton) {
+                    // Restaurar o conteúdo original do botão - é necessário um atributo data-original-html
+                    // mas para simplificar, vamos apenas reabilitar
+                    submitButton.disabled = false;
+                    // Assumindo que o HTML original está definido no _ConectarEquipamentosPartial.cshtml,
+                    // vamos apenas reabilitar o botão aqui, o re-bind 400 corrigirá o HTML.
+                }
+
+                const isAIAnalysis = actionUrl.includes('ProcessarAnalise');
+
+                if (response.ok) {
+                    if (isAIAnalysis) {
+                        // FLUXO DE IA (Substitui o formulário pelo resultado)
+                        return response.text().then(html => {
+                            modalBody.innerHTML = html;
+                            // O re-bind é CRUCIAL: Adiciona o listener para o botão 'Fechar'
+                            // Embora não haja um formId para a tela de resultado, 
+                            // bindModalEventListeners cuidará do botão de Cancelar/Fechar.
+                            bindModalEventListeners('iaAnalysisForm'); // Passa o ID do form anterior
+                        });
+                    } else {
+                        // FLUXO CRUD PADRÃO (Successo na Criação/Edição/Exclusão)
+                        closeModal();
+                        // Recarrega a página para atualizar a tabela
+                        window.location.reload();
+                    }
+                } else if (response.status === 400) {
+                    // Erro de Validação (Controller retorna PartialView com ModelState.Errors)
+                    return response.text().then(html => {
+                        modalBody.innerHTML = html;
+                        // O re-bind é CRUCIAL após o erro 400. Ele re-analisa o form e re-adiciona o submit handler.
+                        bindModalEventListeners(formId);
+                        // Removido o alert, pois a validação deve ser exibida no formulário
+                    });
+                } else {
+                    // Outro erro (500, etc.)
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+            })
+            .catch(error => {
+                console.error('Erro na submissão do formulário:', error);
+                alert(`Erro na submissão: ${error.message}`);
+                // Reabilitar o botão de submit em caso de erro na requisição (ex: falha de rede)
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    // Para restaurar o ícone original, seria necessário ter salvo o innerHTML original
+                    // Exemplo: submitButton.innerHTML = submitButton.getAttribute('data-original-html');
+                }
+            });
     };
-    
+
     // Adiciona o novo handler.
     form.addEventListener('submit', form.currentSubmitHandler);
 }
@@ -162,7 +175,7 @@ document.querySelectorAll('[data-action-type="create-modal"]').forEach(button =>
         const url = this.getAttribute('data-url');
         const title = this.getAttribute('data-title');
         const formId = this.getAttribute('data-form-id');
-        loadPartialView(url, 'GET', title, formId); 
+        loadPartialView(url, 'GET', title, formId);
     });
 });
 
@@ -177,8 +190,8 @@ document.querySelectorAll('.btn-ajax-modal').forEach(button => {
         const titleTemplate = this.getAttribute('data-title');
 
         let url = '';
-        let title = titleTemplate.replace('{ID}', id); 
-        
+        let title = titleTemplate.replace('{ID}', id);
+
         // Constrói a URL dinamicamente
         if (actionType === 'delete') {
             // Ação de Exclusão usa a Action "DeleteConfirmation" no Controller
@@ -187,7 +200,7 @@ document.querySelectorAll('.btn-ajax-modal').forEach(button => {
             // Ações "Edit" e "Details" usam a Action com o mesmo nome
             url = `${baseControllerUrl}/${actionType}/${id}`;
         }
-        
+
         loadPartialView(url, 'GET', title, formId);
     });
 });
@@ -197,7 +210,7 @@ document.querySelectorAll('.btn-ajax-modal').forEach(button => {
 closeModalButton.addEventListener('click', closeModal);
 
 // 4. Fechar a modal clicando fora
-modalOverlay.addEventListener('click', function(e) {
+modalOverlay.addEventListener('click', function (e) {
     if (e.target === modalOverlay) {
         closeModal();
     }
@@ -211,20 +224,20 @@ function bindModalEventListeners(formId) {
     const cancelButton = document.getElementById('cancelModalButton'); // Usar ID genérico
     if (cancelButton) {
         // Remove e adiciona o listener para garantir que só haja um
-        cancelButton.removeEventListener('click', closeModal); 
+        cancelButton.removeEventListener('click', closeModal);
         cancelButton.addEventListener('click', closeModal);
     }
-    
+
     // 2. Reativação da Validação Unobtrusive (Crucial!)
     // Apenas aplica no formulário carregado.
     if (window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive) {
         const form = document.getElementById(formId);
-        if(form) {
+        if (form) {
             // Remove dados de validação antigos e re-analisa o formulário
             jQuery(form).removeData('validator');
             jQuery(form).removeData('unobtrusiveValidation');
             jQuery.validator.unobtrusive.parse(form);
-            
+
             // O código abaixo é apenas para fins de debug e pode ser removido
             // console.log(`Validação Unobtrusive re-analisada para #${formId}`);
         }

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "KNbQ/osEbaQidf/WNKD80+1/FjIwJHjJjoN2ByeBNxc=",
+  "Hash": "ZlfsfFujjpdo4GfAEMGQpr1fg62knlWsZplFzW7DPkI=",
   "Source": "VigiLant",
   "BasePath": "_content/VigiLant",
   "Mode": "Default",
@@ -110,6 +110,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\dash.css"
+    },
+    {
+      "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\iaanalysis.css",
+      "SourceId": "VigiLant",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\",
+      "BasePath": "_content/VigiLant",
+      "RelativePath": "css/iaanalysis.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\iaanalysis.css"
     },
     {
       "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\site.css",

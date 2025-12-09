@@ -66,6 +66,8 @@ logo apos use o padrão:
     "Status": 1
 }
 
+MQTTX
+
 ## Recursos-Chave
 
 Módulo	Descrição	Valor

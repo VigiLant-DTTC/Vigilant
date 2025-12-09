@@ -1,0 +1,59 @@
+
+.analysis-info-container {
+    background-color: #e6f7ff; /* Azul claro para fundo */
+    border: 1px solid #91d5ff; /* Borda azul */
+    border-radius: .25rem;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.analysis-info-container h4 {
+    color: #096dd9; /* Azul escuro para título */
+    margin-bottom: 10px;
+}
+
+.analysis-info-container li {
+    margin-bottom: 5px;
+}
+
+/* --- Estilos para o Resultado da Análise (Cor Verde de Sucesso) --- */
+.analysis-result-container {
+    background-color: #f6ffed; /* Verde claro para fundo */
+    border: 1px solid #b7eb8f; /* Borda verde */
+    border-radius: .25rem;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.analysis-result-container h4 {
+    color: #52c41a; /* Verde forte para título */
+    margin-bottom: 15px;
+}
+
+.analysis-result-container strong {
+    font-weight: 700;
+    color: #389e0d; /* Destaque para subtítulos (Sugestões, Riscos) */
+    display: block; /* Garante que o strong ocupe a linha toda */
+    margin-top: 10px;
+}
+
+.analysis-result-container ul {
+    list-style: none; /* Remove bullet points */
+    padding-left: 0;
+    margin-top: 5px;
+}
+
+.analysis-result-container ul li {
+    padding: 5px 0;
+    border-bottom: 1px dashed #e8e8e8;
+}
+
+.analysis-result-container ul li:last-child {
+    border-bottom: none;
+}
+
+/* --- Estilo de separador (reutiliza .divider se disponível ou cria um novo) --- */
+.divider {
+    border-top: 1px solid #e8e8e8;
+    margin: 15px 0;
+}
