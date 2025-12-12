@@ -10,6 +10,16 @@
 
 <div class="auth-container">
 
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="success-message">@TempData["Sucesso"]</div>
+    }
+
+    @if (ViewBag.Erro != null)
+    {
+        <div class="error-message">@ViewBag.Erro</div>
+    }
+
     <a class="logo">
         <i class="bx bx-shield-alt"></i>
         <div class="logo-name"><span>Vigi</span>Lant</div>
@@ -34,13 +44,3 @@
         </p>
     </form>
 </div>
-
-@if (TempData["Sucesso"] != null)
-{
-    <div class="success-message">@TempData["Sucesso"]</div>
-}
-
-@if (ViewBag.Erro != null)
-{
-    <div class="error-message">@ViewBag.Erro</div>
-}

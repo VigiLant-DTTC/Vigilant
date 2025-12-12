@@ -1,20 +1,22 @@
-/* Estilos Gerais para o Corpo e Centralização */
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f0f2f5; /* Cor de fundo suave */
+    background-color: #f0f2f5; 
     margin: 0;
-    display: flex; /* Habilita o Flexbox */
-    justify-content: center; /* Centraliza o conteúdo horizontalmente (eixo principal) */
-    align-items: center; /* Centraliza o conteúdo verticalmente (eixo cruzado) */
-    /* -------------------------------------------------------- */
-    padding: 30px;
+    display: flex; 
+    justify-content: center; /* Centraliza Horizontal */
+    align-items: center; /* Centraliza Vertical */
+    min-height: 100vh; 
+    /* REMOVER padding: 30px; SE ESTIVER PRESENTE */ 
+    padding: 0; /* Garante que não há padding externo */
 }
 
 /* Container Principal (auth-container) */
 .auth-container {
     width: 100%;
-    max-width: 400px;/* Largura máxima para formulários */
+    max-width: 400px;
     padding: 40px; 
+    /* Adicionar um margem vertical mínima para telas menores */
+    margin: 20px 0; 
 }
 
 /* Estilo do Formulário (auth-form) */
@@ -85,16 +87,37 @@ body {
     transform: translateY(-1px); /* Leve levantamento */
 }
 
-/* Mensagem de Erro */
+/* Estilo para Mensagens de Sucesso e Erro (MODIFICADO) */
+.success-message,
 .error-message {
-    background-color: #f8d7da; /* Fundo vermelho claro */
-    color: #721c24; /* Texto vermelho escuro */
-    border: 1px solid #f5c6cb;
-    padding: 10px;
-    border-radius: 4px;
+    /* Define o posicionamento fixo em relação à janela (viewport) */
+    position: fixed;
+    top: 40px; /* Distância do topo */
+    left: 52%; /* Centraliza horizontalmente */
+    transform: translateX(-50%); 
+    width: 90%;
+    max-width: 300px;
+    padding: 15px 20px;
+    border-radius: 8px;
     text-align: center;
-    font-weight: 500;
-    margin-bottom: 10px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0.95;
+}
+
+/* Mensagem de Erro (EXISTENTE - Apenas a cor) */
+.error-message {
+    background-color: #f8d7da; /* Fundo vermelho claro [cite: 17] */
+    color: #721c24; /* Texto vermelho escuro [cite: 17] */
+    border: 1px solid #f5c6cb;
+}
+
+/* Mensagem de Sucesso (ADICIONADO) */
+.success-message {
+    background-color: #d4edda; /* Fundo verde claro */
+    color: #155724; /* Texto verde escuro */
+    border: 1px solid #c3e6cb;
 }
 
 /* Alternador de Autenticação (auth-switch) */
