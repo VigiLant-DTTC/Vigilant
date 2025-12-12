@@ -11,5 +11,9 @@ namespace VigiLant.Models
         public string Email { get; set; } = string.Empty;
         public string Telefone { get; set; } = string.Empty;
         public DateTime DataAdmissao { get; set; }
+
+        // --- VINCULAÇÃO ---
+        public int? UsuarioId { get; set; }
+        public StatusVinculacao StatusAcesso { get; set; }
     }
 }

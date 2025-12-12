@@ -15,24 +15,19 @@
             <span class="active">Riscos</span>
         </div>
     </div>
-
+    @if (User.IsInRole("Administrador") || User.IsInRole("Gestor"))
+{
     <div class="page-actions">
         <div></div>
         <div class="btts">
-            <button type="button" class="btn-secondary" id="btnIA" data-action-type="create-modal"
-                data-url="@Url.Action("AnaliseRiscos", "IA")" data-title="Análise de Riscos e Soluções (IA)"
-                data-form-id="iaAnalysisForm">
-                <i class="fas fa-microchip"></i>
-                IA
-            </button>
-
             <button type="button" class="btn-primary" id="btnAddRisco" data-action-type="create-modal"
                 data-url="@Url.Action("Create", "Riscos")" data-title="Adicionar Novo Risco Manualmente"
-                data-form-id="riscoForm" <i class="fas fa-plus"></i>
+                data-form-id="riscoForm"> <i class="fas fa-plus"></i>
                 Adicionar Novo Risco Manualmente
             </button>
         </div>
     </div>
+}
 </div>
 
 <div class="table-container">
@@ -67,7 +62,7 @@
                                     NivelSeveridade.Alto => "danger",
                                     NivelSeveridade.Medio => "warning",
                                     _ => "success"
-                                };
+                                                };
                             }
                             <span class="status-badge @gravidadeClass nivel-gravidade">
                                 @risco.NivelGravidade

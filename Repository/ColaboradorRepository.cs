@@ -76,5 +76,17 @@ namespace VigiLant.Repository
                 _context.SaveChanges();
             }
         }
+
+        public async Task<Colaborador?> GetByEmail(string email)
+        {
+            return await _context.Colaboradores
+                                 .FirstOrDefaultAsync(c => c.Email == email);
+        }
+
+        public void UpdateStatusVinculacao(Colaborador colaborador)
+        {
+            _context.Colaboradores.Update(colaborador);
+            _context.SaveChanges();
+        }
     }
 }

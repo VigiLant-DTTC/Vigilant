@@ -18,11 +18,6 @@
     <form asp-controller="Conta" asp-action="Login" method="post" class="auth-form">
         <h2>Login</h2>
 
-        @if (ViewBag.Erro != null)
-        {
-            <div class="error-message">@ViewBag.Erro</div>
-        }
-
         <div class="form-group">
             <label for="email">E-mail</label>
             <input type="email" id="email" name="email" required />
@@ -39,3 +34,13 @@
         </p>
     </form>
 </div>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="success-message">@TempData["Sucesso"]</div>
+}
+
+@if (ViewBag.Erro != null)
+{
+    <div class="error-message">@ViewBag.Erro</div>
+}

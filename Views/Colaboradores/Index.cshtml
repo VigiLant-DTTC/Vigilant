@@ -40,6 +40,7 @@
                 <th>Email</th>
                 <th>Telefone</th>
                 <th>Data Admissão</th>
+                <th>Acesso</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -56,6 +57,16 @@
                         <td>@colaborador.Email</td>
                         <td>@colaborador.Telefone</td>
                         <td>@colaborador.DataAdmissao.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (colaborador.StatusAcesso == VigiLant.Models.Enum.StatusVinculacao.Vinculado)
+                            {
+                                <span class="badge badge-success">Vinculado</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-warning">Pendente</span>
+                            }
+                        </td>
                         <td>
                             <div class="table-actions">
                                 @if (User.IsInRole("Administrador") || User.IsInRole("Gestor"))
@@ -95,7 +106,8 @@
         <div class="empty-list-message">
             <i class="fas fa-file-excel icon-large"></i>
             <h3>Nenhum Colaborador Encontrado</h3>
-            <p>Clique em <b>Adicionar Novo Colaborador</b> para vincular o usuário e configurar suas permissões de acesso e monitoramento.</p>
+            <p>Clique em <b>Adicionar Novo Colaborador</b> para vincular o usuário e configurar suas permissões de acesso e
+                monitoramento.</p>
         </div>
     }
 </div>

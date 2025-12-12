@@ -6,9 +6,11 @@
 <form asp-action="Edit" method="post" id="editColaboradorForm">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
     <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="UsuarioId" />
+    <input type="hidden" asp-for="StatusAcesso" />
     
-    @* Usando o layout 'SuperFlex' do seu CSS *@
     <div class="SuperFlex"> 
         <div class="flex1">
             <div class="form-group mb-3">

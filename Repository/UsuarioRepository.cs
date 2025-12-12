@@ -4,6 +4,7 @@ using VigiLant.Data;
 using VigiLant.Models;
 using Microsoft.EntityFrameworkCore;
 using VigiLant.Contratos;
+using VigiLant.Models.Enum;
 
 namespace VigiLant.Repository
 {
@@ -26,6 +27,17 @@ namespace VigiLant.Repository
         {
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateCargo(int usuarioId, Cargo novoCargo)
+        {
+            var usuario = await _context.Usuarios.FindAsync(usuarioId);
+            if (usuario != null)
+            {
+                usuario.cargo = novoCargo;
+                _context.Usuarios.Update(usuario);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

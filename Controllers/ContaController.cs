@@ -13,11 +13,13 @@ public class ContaController : Controller
 {
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IHashService _hashService;
+    private readonly IColaboradorRepository _colaboradorRepository;
 
-    public ContaController(IUsuarioRepository usuarioRepository, IHashService hashService)
+    public ContaController(IUsuarioRepository usuarioRepository, IHashService hashService, IColaboradorRepository colaboradorRepository)
     {
         _usuarioRepository = usuarioRepository;
         _hashService = hashService;
+        _colaboradorRepository = colaboradorRepository;
     }
 
     private IActionResult RedirecionarParaHome() => RedirectToAction("Index", "Home");
@@ -98,26 +100,55 @@ public class ContaController : Controller
     public async Task<IActionResult> Register(string nome, string email, string senha)
     {
         ViewData["Title"] = "Register";
-        // 1. Verificar se o usuário já existe
+        // 1. Verificar se o e-mail já foi usado para criar uma conta de usuário
         if (await _usuarioRepository.BuscarPorEmail(email) != null)
         {
-            ViewBag.Erro = "Este e-mail já está cadastrado.";
+            ViewBag.Erro = "Este e-mail já está cadastrado no sistema. Por favor, faça login.";
             return View();
         }
 
-        // 2. Criar novo usuário e hash da senha
+        // 2. Tentar encontrar o colaborador correspondente no banco de dados
+        var colaborador = await _colaboradorRepository.GetByEmail(email);
+
+        if (colaborador == null)
+        {
+            // CASO 1: Colaborador NÃO existe na base da empresa
+            // O sistema deve bloquear o registro e informar a necessidade de solicitação
+            ViewBag.Erro = "Seu e-mail não consta. Uma solicitação de participação será enviada.";
+            // Aqui você pode adicionar lógica para realmente enviar a solicitação, se necessário.
+            return View();
+        }
+
+        // 3. Verificar se o colaborador já está vinculado a uma conta de usuário
+        if (colaborador.UsuarioId.HasValue)
+        {
+            // Esta verificação já é coberta pela busca no _usuarioRepository,
+            // mas é um ponto de segurança: se ele tem UsuarioId, a conta já existe
+            ViewBag.Erro = "O colaborador com este e-mail já está vinculado Por favor, use a tela de login.";
+            return View();
+        }
+
+        // CASO 2: Colaborador ENCONTRADO e NÃO VINCULADO
+
+        // 4. Criar novo usuário do sistema
         var novoUsuario = new Usuario
         {
             Nome = nome,
             Email = email,
-            SenhaHash = _hashService.GerarHash(senha), // Usa o Hash PBKDF2
-            cargo = Cargo.Colaborador // Define um cargo padrão para novos registros
+            SenhaHash = _hashService.GerarHash(senha),
+            cargo = colaborador.Cargo
         };
 
-        // 3. Salvar no DB
+        // 5. Salvar o novo Usuário no DB
         await _usuarioRepository.Adicionar(novoUsuario);
 
-        // Por simplicidade, redireciona para o login após o registro bem-sucedido
+        // 6. VINCULAR: Atualizar o registro do Colaborador com o novo UsuarioId e Status
+        colaborador.UsuarioId = novoUsuario.Id;
+        colaborador.StatusAcesso = StatusVinculacao.Vinculado;
+        _colaboradorRepository.UpdateStatusVinculacao(colaborador);
+
+        // 7. Sucesso! Redireciona com mensagem de sucesso de vinculação
+        TempData["Sucesso"] = "Registro realizado e conta vinculada ao seu perfil de colaborador com sucesso. Por favor, faça login.";
         return RedirectToAction("Login");
     }
 

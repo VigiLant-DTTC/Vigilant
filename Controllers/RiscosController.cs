@@ -12,7 +12,7 @@ namespace VigiLant.Controllers
     public class RiscosController : Controller
     {
         private readonly IRiscoRepository _riscoRepository;
-        private readonly IEquipamentoRepository _equipamentoRepository; // <--- Adicionar esta linha
+        private readonly IEquipamentoRepository _equipamentoRepository; 
 
         public RiscosController(IRiscoRepository riscoRepository, IEquipamentoRepository equipamentoRepository)
         {

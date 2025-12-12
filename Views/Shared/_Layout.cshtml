@@ -44,6 +44,16 @@
                             <hr class="menu-divider">
                         </li>
                         <li>
+                            <a href="@Url.Action("", "")"
+                                class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "" ? "active" : "")">
+                                <i class="fas fa-microchip"></i>
+                                <span>IA Análise</span>
+                            </a>
+                        </li>
+                        <li class="separator-item">
+                            <hr class="menu-divider">
+                        </li>
+                        <li>
                             <a href="@Url.Action("Index", "Riscos")"
                                 class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Riscos" ? "active" : "")">
                                 <i class="bx bx-shield-alt menu-icon"></i>
@@ -64,30 +74,37 @@
                                 <span>Colaboradores</span>
                             </a>
                         </li>
+
                         <li class="separator-item">
                             <hr class="menu-divider">
                         </li>
-                         @if (User.IsInRole("Administrador") || User.IsInRole("Gestor"))
+
+                        @if (User.IsInRole("Administrador") || User.IsInRole("Gestor"))
                         {
-                        <li>
-                            <a href="@Url.Action("Index", "Relatorios")"
-                                class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Relatorios" ? "active" : "")">
-                                <i class="bx bx-file menu-icon"></i>
-                                <span>Relatórios</span>
-                            </a>
-                        </li>
                             <li>
-                                <a href="@Url.Action("Index", "Configuracoes")"
-                                    class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Configuracoes" ? "active" : "")">
-                                    <i class="bx bx-cog menu-icon"></i>
-                                    <span>Configurações</span>
+                                <a href="@Url.Action("Index", "Relatorios")"
+                                    class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Relatorios" ? "active" : "")">
+                                    <i class="bx bx-file menu-icon"></i>
+                                    <span>Relatórios</span>
                                 </a>
                             </li>
-                        }
+                            }
+                            <li>
+                                <a href="@Url.Action("", "")"
+                                    class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "" ? "active" : "")">
+                                    <i class="bx bx-bell menu-icon"></i>
+                                    <span>Alertas</span>
+                                </a>
+                            </li>
                     </ul>
                 </nav>
 
                 <div class="sidebar-footer">
+                    <a href="@Url.Action("Index", "Configuracoes")"
+                        class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Configuracoes" ? "active" : "")">
+                        <i class="fas fa-cog menu-icon"></i>
+                        <span>Configurações</span>
+                    </a>
                     <a href="javascript:document.getElementById('logoutFormSidebar').submit()" class="logout-link-anchor">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Sair</span>

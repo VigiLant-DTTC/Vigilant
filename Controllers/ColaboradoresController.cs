@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using VigiLant.Models;
 using VigiLant.Contratos;
 using Microsoft.AspNetCore.Authorization;
-using System; 
+using System;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace VigiLant.Controllers
 {
@@ -10,16 +12,18 @@ namespace VigiLant.Controllers
     public class ColaboradoresController : Controller
     {
         private readonly IColaboradorRepository _colaboradorRepository;
+        private readonly IUsuarioRepository _usuarioRepository;
 
-        public ColaboradoresController(IColaboradorRepository colaboradorRepository)
+        public ColaboradoresController(IColaboradorRepository colaboradorRepository, IUsuarioRepository usuarioRepository)
         {
             _colaboradorRepository = colaboradorRepository;
+            _usuarioRepository = usuarioRepository;
         }
 
         // Helper para verificar se a requisição é AJAX
         private bool IsAjaxRequest()
         {
-            return Request.Headers["X-Requested-With"] == "XMLHttpRequest"; 
+            return Request.Headers["X-Requested-With"] == "XMLHttpRequest";
         }
 
         // GET: /Colaboradores/Index
@@ -33,10 +37,10 @@ namespace VigiLant.Controllers
         public IActionResult Create()
         {
             var novoColaborador = new Colaborador { DataAdmissao = DateTime.Today };
-            
+
             if (IsAjaxRequest())
             {
-                return PartialView("_CreateColaboradorPartial", novoColaborador); 
+                return PartialView("_CreateColaboradorPartial", novoColaborador);
             }
             return View(novoColaborador);
         }
@@ -49,11 +53,11 @@ namespace VigiLant.Controllers
             if (ModelState.IsValid)
             {
                 _colaboradorRepository.Add(colaborador);
-                
+
                 if (IsAjaxRequest()) { return Ok(); } // Sucesso AJAX
                 return RedirectToAction(nameof(Index));
             }
-            
+
             if (IsAjaxRequest())
             {
                 Response.StatusCode = 400; // Erro de Validação
@@ -70,7 +74,7 @@ namespace VigiLant.Controllers
 
             if (IsAjaxRequest())
             {
-                return PartialView("_DetailsColaboradorPartial", colaborador); 
+                return PartialView("_DetailsColaboradorPartial", colaborador);
             }
             return View(colaborador);
         }
@@ -80,10 +84,10 @@ namespace VigiLant.Controllers
         {
             var colaborador = _colaboradorRepository.GetById(id);
             if (colaborador == null) { return NotFound(); }
-            
+
             if (IsAjaxRequest())
             {
-                return PartialView("_EditColaboradorPartial", colaborador); 
+                return PartialView("_EditColaboradorPartial", colaborador);
             }
             return View(colaborador);
         }
@@ -91,18 +95,49 @@ namespace VigiLant.Controllers
         // POST: /Colaboradores/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Colaborador colaborador)
+        // Mude o retorno para Task<IActionResult> e adicione 'async'
+        public async Task<IActionResult> Edit(Colaborador colaborador)
         {
             if (ModelState.IsValid)
             {
-                _colaboradorRepository.Update(colaborador);
-                if (IsAjaxRequest()) { return Ok(); } // Sucesso AJAX
-                return RedirectToAction(nameof(Index));
+                // 1. Atualiza o Colaborador (Cargo, Nome, etc.)
+                _colaboradorRepository.Update(colaborador); // [cite: 5]
+
+                bool cargoAtualizadoParaUsuarioLogado = false;
+
+                // 2. Propaga a mudança de Cargo para o Usuário vinculado
+                if (colaborador.UsuarioId.HasValue) 
+                {
+                    // Chama o método assíncrono para atualizar o cargo do usuário
+                    await _usuarioRepository.UpdateCargo(colaborador.UsuarioId.Value, colaborador.Cargo); // [cite: 5]
+                    
+                    // 3. Verifica se o usuário logado é o colaborador que teve o cargo alterado
+                    var currentUserIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                    
+                    if (currentUserIdClaim != null && int.TryParse(currentUserIdClaim.Value, out int userId) && userId == colaborador.UsuarioId.Value)
+                    {
+                        cargoAtualizadoParaUsuarioLogado = true;
+                    }
+                }
+
+                if (IsAjaxRequest()) { return Ok(); }
+                
+                // 4. Se o usuário logado teve seu cargo alterado, força o logout e redireciona para o login com aviso.
+                if (cargoAtualizadoParaUsuarioLogado)
+                {
+                    // Limpar o cookie de autenticação
+                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    
+                    TempData["Sucesso"] = "Seu cargo foi atualizado. Por favor, faça login novamente para que o novo cargo seja aplicado.";
+                    return RedirectToAction("Login", "Conta");
+                }
+                
+                return RedirectToAction(nameof(Index)); // [cite: 5]
             }
-            
+
             if (IsAjaxRequest())
             {
-                Response.StatusCode = 400; 
+                Response.StatusCode = 400;
                 return PartialView("_EditColaboradorPartial", colaborador); // Retorna a Partial com erros
             }
             return View(colaborador);
@@ -113,10 +148,10 @@ namespace VigiLant.Controllers
         {
             var colaborador = _colaboradorRepository.GetById(id);
             if (colaborador == null) { return NotFound(); }
-            
+
             if (IsAjaxRequest())
             {
-                return PartialView("_DeleteColaboradorPartial", colaborador); 
+                return PartialView("_DeleteColaboradorPartial", colaborador);
             }
             return View(colaborador);
         }
@@ -127,7 +162,7 @@ namespace VigiLant.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
             _colaboradorRepository.Delete(id);
-            
+
             if (IsAjaxRequest()) { return Ok(); } // Sucesso AJAX
             return RedirectToAction(nameof(Index));
         }
