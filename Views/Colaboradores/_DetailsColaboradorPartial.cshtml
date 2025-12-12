@@ -37,7 +37,14 @@
 
         <div class="row mb-2">
             <dt class="col-sm-4">Acesso: </dt>
-            <dd class="col-sm-8">@Model.StatusAcesso</dd>
+            @if (Model.StatusAcesso == VigiLant.Models.Enum.StatusVinculacao.Ativo)
+            {
+                <span class="badge badge-success">Ativo</span>
+            }
+            else
+            {
+                <span class="badge badge-warning">Pendente</span>
+            }
         </div>
     </div>
 </div>

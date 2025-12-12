@@ -6,7 +6,7 @@ namespace VigiLant.Contratos
 {
     public interface IAppConfigRepository
     {
-        AppConfig GetConfig();
+        AppConfig? GetConfig();
         void UpdateConfig(AppConfig config);
     }
 }

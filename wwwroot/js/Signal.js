@@ -55,6 +55,14 @@ connection.on("ReceberAtualizacaoEquipamento", (equipamento) => {
     }
 });
 
+// 2. Lógica para receber o NOVO RISCO (Crucial)
+connection.on("NovoRiscoGerado", function (risco) {
+    // Exibe uma notificação ou insere na tabela de riscos
+    alert(`NOVO RISCO DETECTADO! ${risco.Nome} - Gravidade: ${risco.NivelGravidade}`);
+    // Exemplo: Adicionar linha na tabela de riscos
+    adicionarRiscoNaTabela(risco);
+});
+
 // 4. Inicia a conexão
 async function startSignalR() {
     try {

@@ -41,6 +41,10 @@
       "PackagePath": "staticwebassets\\js\\Partialjs.js"
     },
     {
+      "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\js\\Signal.js",
+      "PackagePath": "staticwebassets\\js\\Signal.js"
+    },
+    {
       "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
     },

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using MQTTnet;
 using MQTTnet.Client;
+using VigiLant.Config;
 using VigiLant.Contratos;
 using VigiLant.Data;
 using VigiLant.Hubs;
@@ -23,6 +24,10 @@ builder.Services.AddDbContext<BancoCtx>(opt =>
     opt.UseMySql(mySqlConnection, ServerVersion.AutoDetect(mySqlConnection));
 });
 
+
+//Config
+builder.Services.AddScoped<IAppConfigRepository, AppConfigRepository>();
+
 // Repositorios e contratos
 builder.Services.AddScoped<IRiscoRepository, RiscoRepository>();
 builder.Services.AddScoped<IEquipamentoRepository, EquipamentoRepository>();
@@ -30,12 +35,14 @@ builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
 
-builder.Services.AddScoped<IAppConfigRepository, AppConfigRepository>();
+// 4. Adicionar o serviço SignalR e o Hub
+builder.Services.AddSignalR();
 
 // Servicos
 builder.Services.AddSingleton<IHashService, HashService>();
-builder.Services.AddSingleton<IMqttService, MqttClientService>();
-builder.Services.AddHostedService(provider => (MqttClientService)provider.GetRequiredService<IMqttService>());
+builder.Services.AddSingleton<MqttClientService>();
+builder.Services.AddSingleton<IHostedService>(provider => provider.GetRequiredService<MqttClientService>());
+builder.Services.AddSingleton<IMqttService>(provider => provider.GetRequiredService<MqttClientService>()); 
 
 
 // Registra a Factory e o Cliente MQTT como Singleton (devem ser persistentes)
@@ -46,10 +53,6 @@ builder.Services.AddSingleton<IMqttClient>(sp =>
     return factory.CreateMqttClient();
 });
 
-// Registro do Serviço de Background (A ponte entre MQTT e SignalR)
-
-// Registro do SignalR
-builder.Services.AddSignalR();
 
 //Cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

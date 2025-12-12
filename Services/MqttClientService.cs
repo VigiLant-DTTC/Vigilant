@@ -14,6 +14,8 @@ using VigiLant.Models.Payload;
 using VigiLant.Models.Enum;
 using Microsoft.AspNetCore.SignalR;
 using VigiLant.Hubs;
+using VigiLant.Models;
+using VigiLant.Config;
 
 namespace VigiLant.Services
 {
@@ -146,13 +148,51 @@ namespace VigiLant.Services
                     using (var scope = _serviceProvider.CreateScope())
                     {
                         var repo = scope.ServiceProvider.GetRequiredService<IEquipamentoRepository>();
+                        var riscoRepo = scope.ServiceProvider.GetRequiredService<IRiscoRepository>();
+
 
                         // Busca o equipamento usando o IdentificadorBroker do payload
                         var equipamento = repo.GetAll().FirstOrDefault(eq => eq.IdentificadorBroker == data.Identificador);
 
                         if (equipamento != null)
                         {
-                            // Chamada ao Repositório para atualizar os dados
+                            string valorLimpo = System.Text.RegularExpressions.Regex.Replace(data.ValorMedicao, "[^0-9.,]", "");
+
+                            if (double.TryParse(valorLimpo, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double valorMedicaoDouble))
+                            {
+                                _logger.LogInformation($"DEBUG: Medição lida. Sensor: {(TipoSensores)data.TipoSensor}, Valor: {valorMedicaoDouble}");
+
+                                var (isRisco, nivelGravidade, nomeRisco) = LimitesMedicao.AvaliarMedicao(
+                                    (TipoSensores)data.TipoSensor,
+                                    valorMedicaoDouble
+                                );
+
+                                _logger.LogInformation($"DEBUG: Avaliação. IsRisco: {isRisco}, Nível: {nivelGravidade}");
+
+                                if (isRisco)
+                                {
+                                    // CRIAÇÃO AUTOMÁTICA DO RISCO
+                                    var novoRisco = new Risco
+                                    {
+                                        Nome = nomeRisco, // Nome gerado dinamicamente
+                                        Descricao = $"Medição de {valorMedicaoDouble} {LimitesMedicao.Regras[(TipoSensores)data.TipoSensor].Unidade} para o sensor de {equipamento.TipoSensor} está fora dos limites de segurança.",
+                                        NivelGravidade = nivelGravidade,
+                                        Equipamento = equipamento.Nome,
+                                        Status = StatusRisco.Pendente, // Garantindo o status Pendente
+                                        DataIdentificacao = DateTime.Now
+                                    };
+
+                                    riscoRepo.Add(novoRisco);
+                                    _logger.LogWarning($"RISCO AUTOMÁTICO CRIADO: Equipamento #{equipamento.Id} - {nomeRisco}");
+
+                                    await _medicaoHubContext.Clients.All.SendAsync("NovoRiscoGerado", novoRisco);
+                                }
+                            }
+                            else
+                            {
+                                _logger.LogWarning($"Dados recebidos para identificador não cadastrado: {data.Identificador}"); // <-- Verifique este log
+                            }
+
                             repo.AtualizarDadosEmTempoReal(
                                 equipamento.Id,
                                 (StatusEquipament)data.Status,

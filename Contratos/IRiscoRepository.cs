@@ -8,7 +8,6 @@ namespace VigiLant.Contratos
 
         Risco GetById(int id);
 
-
         void Add(Risco risco);
 
         void Update(Risco risco);

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "ZlfsfFujjpdo4GfAEMGQpr1fg62knlWsZplFzW7DPkI=",
+  "Hash": "cVRfudkQFEyhkak2WuvwtgL4Mc9favr+EJZBxabLgpw=",
   "Source": "VigiLant",
   "BasePath": "_content/VigiLant",
   "Mode": "Default",
@@ -224,6 +224,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\Partialjs.js"
+    },
+    {
+      "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\js\\Signal.js",
+      "SourceId": "VigiLant",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\",
+      "BasePath": "_content/VigiLant",
+      "RelativePath": "js/Signal.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\Signal.js"
     },
     {
       "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\js\\site.js",

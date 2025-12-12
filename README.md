@@ -39,6 +39,12 @@ dotnet watch run
 
 ---
 
+Apos isso faça login no sistema com conta adm
+```bash
+Email: admin@vigilant.com.br
+Senha: Admin123
+```
+
 ##  Problema 
 
 A gestão de riscos na Renault era baseada em processos manuais e reativos, resultando em:
@@ -58,13 +64,18 @@ A gestão de riscos na Renault era baseada em processos manuais e reativos, resu
 Para testar a conexão do broker sem um sensor e asp, configure o MQTT Broker do sistema ( mqttHost, MqttPort e MqttTopicWildcard)
 logo apos use o padrão:
 
+Ex: Vigilant/command/ (para ativar seu sensor)
+Ex: Vigilant/data/ (para mandar informações do sensor)
+
+De um nome a seu sensor: Ex: Vigilant/command/SENS_01
+
 {
-  "Identificador": "SENSOR_01",
-  "Nome": "Medidor de Corrente Principal",
-  "Localizacao": "Painel Elétrico B1",
-  "TipoSensor": 1, 
+  "Identificador": "SENS_01",
+  "Nome": "Motor Principal",
+  "Localizacao": "Almoxarifado Leste",
+  "TipoSensor": 9, 
   "Status": 1,
-  "ValorMedicao": "20.5 A" 
+  "ValorMedicao": "15.5A"
 }
 
 ## Recursos-Chave
