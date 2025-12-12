@@ -41,6 +41,7 @@
                 <th>Identificador</th>
                 <th>Localização</th>
                 <th>Status</th>
+                <th>Última Medição</th>
                 <th>Última Atualização</th>
                 <th>Ações</th>
             </tr>
@@ -69,6 +70,7 @@
                                 @equipamento.Status
                             </span>
                         </td>
+                        <td class="medicao-dinamica">@equipamento.UltimaMedicao</td>
                         <td>@equipamento.UltimaAtualizacao.ToString("dd/MM/yyyy HH:mm:ss")</td>
                         <td>
                             <div class="table-actions">
@@ -120,5 +122,6 @@
 </div>
 
 @section Scripts {
+    <script src="/js/Signal.js"></script>
     <script src="/js/Partialjs.js" asp-append-version="true"></script>
 }

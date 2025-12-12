@@ -19,6 +19,8 @@ namespace VigiLant.Models
 
         public TipoSensores TipoSensor { get; set; }
 
+        public string UltimaMedicao { get; set; }
+
 
         // Propriedade para o identificador único (Token/ID) usado na conexão com o broker
         public string IdentificadorBroker { get; set; }

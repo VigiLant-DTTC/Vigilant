@@ -5,7 +5,7 @@
 namespace VigiLant.Migrations
 {
     /// <inheritdoc />
-    public partial class AtualizarEquipamentos : Migration
+    public partial class Indentifyu : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

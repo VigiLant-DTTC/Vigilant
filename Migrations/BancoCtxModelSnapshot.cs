@@ -116,6 +116,10 @@ namespace VigiLant.Migrations
                     b.Property<DateTime>("UltimaAtualizacao")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("UltimaMedicao")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.ToTable("Equipamentos");

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace VigiLant.Models
 {
-    // Model para armazenar o resultado de uma análise de IA
     public class AnaliseRiscoHistorico
     {
         public Guid Id { get; set; } = Guid.NewGuid();

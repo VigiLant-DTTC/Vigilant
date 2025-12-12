@@ -60,9 +60,57 @@ namespace VigiLant.Repository
             return _context.Equipamentos.Find(id);
         }
 
+        public Equipamento Conectar(string identificadorUnico)
+        {
+            if (_context.Equipamentos.Any(e => e.IdentificadorBroker == identificadorUnico))
+            {
+                throw new InvalidOperationException("Um equipamento com este identificador já está cadastrado.");
+            }
+
+            var novoEquipamento = new Equipamento
+            {
+                Id = GetNextAvailableId(),
+                Nome = $"Equipamento NOVO - {identificadorUnico}",
+                Localizacao = "Aguardando dados iniciais do Broker",
+                TipoSensor = TipoSensores.Carregando, // Um valor default, será atualizado
+                Status = StatusEquipament.AguardandoDados,
+                UltimaAtualizacao = DateTime.Now,
+                
+                // NOVO: Valor inicial para a medição.
+                UltimaMedicao = "N/A - Aguardando 1ª Medição",
+                
+                IdentificadorBroker = identificadorUnico
+            };
+
+            _context.Equipamentos.Add(novoEquipamento);
+            _context.SaveChanges();
+
+            return novoEquipamento;
+        }
+
+        public void AtualizarDadosEmTempoReal(int id, StatusEquipament status, string localizacao, string nome, TipoSensores tipoSensor, string ultimaMedicao)
+        {
+            var existing = GetById(id);
+            if (existing != null)
+            {
+                // Atualiza os dados recebidos do broker/serviço MQTT
+                existing.Nome = nome;
+                existing.Localizacao = localizacao;
+                existing.TipoSensor = tipoSensor;
+                existing.Status = status;
+                existing.UltimaAtualizacao = DateTime.Now;
+                
+                // CRÍTICO: Atualiza o valor da medição com o dado recebido
+                existing.UltimaMedicao = ultimaMedicao;
+
+                // Salva a alteração no banco
+                _context.Equipamentos.Update(existing);
+                _context.SaveChanges();
+            }
+        }
+
         public void Add(Equipamento equipamento)
         {
-            equipamento.Id = GetNextAvailableId();
             _context.Equipamentos.Add(equipamento);
             _context.SaveChanges();
         }
@@ -82,49 +130,6 @@ namespace VigiLant.Repository
                 _context.SaveChanges();
             }
         }
-        
-        // --- MÉTODOS ESPECÍFICOS ---
 
-        // Método chamado pelo Controller (usuário clicou em Conectar)
-        public Equipamento Conectar(string identificadorUnico)
-        {
-            // Verifica se o identificador já existe para evitar duplicidade
-            if (_context.Equipamentos.Any(e => e.IdentificadorBroker == identificadorUnico))
-            {
-                throw new InvalidOperationException("Um equipamento com este identificador já está cadastrado.");
-            }
-
-            // Apenas cadastra o equipamento com status inicial (AGUARDANDO DADOS REAIS DO BROKER)
-            var novoEquipamento = new Equipamento
-            {
-                Nome = $"Equipamento NOVO - {identificadorUnico}",
-                Localizacao = "Aguardando dados iniciais do Broker",
-                TipoSensor = TipoSensores.Temperatura, // Um valor default, será atualizado
-                Status = StatusEquipament.AguardandoDados, 
-                UltimaAtualizacao = DateTime.Now,
-                IdentificadorBroker = identificadorUnico
-            };
-
-            Add(novoEquipamento); 
-
-            return novoEquipamento;
-        }
-
-        public void AtualizarDadosEmTempoReal(int id, StatusEquipament status, string localizacao, string nome, TipoSensores tipoSensor)
-        {
-            var existing = GetById(id);
-            if (existing != null)
-            {
-                // Atualiza os dados recebidos do broker/serviço MQTT
-                existing.Nome = nome;
-                existing.Localizacao = localizacao;
-                existing.TipoSensor = tipoSensor;
-                existing.Status = status;
-                existing.UltimaAtualizacao = DateTime.Now;
-
-                // Salva a alteração no banco
-                Update(existing);
-            }
-        }
     }
 }

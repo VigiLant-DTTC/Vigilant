@@ -58,9 +58,9 @@
                         <td>@colaborador.Telefone</td>
                         <td>@colaborador.DataAdmissao.ToString("dd/MM/yyyy")</td>
                         <td>
-                            @if (colaborador.StatusAcesso == VigiLant.Models.Enum.StatusVinculacao.Vinculado)
+                            @if (colaborador.StatusAcesso == VigiLant.Models.Enum.StatusVinculacao.Ativo)
                             {
-                                <span class="badge badge-success">Vinculado</span>
+                                <span class="badge badge-success">Ativo</span>
                             }
                             else
                             {

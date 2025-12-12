@@ -5,24 +5,18 @@
 namespace VigiLant.Migrations
 {
     /// <inheritdoc />
-    public partial class relatorio : Migration
+    public partial class @new : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Titulo",
-                table: "Relatorios",
-                newName: "Nome");
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Nome",
-                table: "Relatorios",
-                newName: "Titulo");
+
         }
     }
 }

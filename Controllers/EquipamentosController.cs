@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using VigiLant.Models.Enum;
 using System;
 using System.Threading.Tasks;
+using VigiLant.Services;
+using VigiLant.Repository;
 
 namespace VigiLant.Controllers
 {
@@ -16,14 +18,18 @@ namespace VigiLant.Controllers
     {
         private readonly IEquipamentoRepository _equipamentoRepository;
 
-        public EquipamentosController(IEquipamentoRepository equipamentoRepository)
+        private readonly IMqttService _mqttService;
+        private readonly IAppConfigRepository _appConfigRepository;
+        public EquipamentosController(IEquipamentoRepository equipamentoRepository, IMqttService mqttService, IAppConfigRepository appConfigRepository)
         {
             _equipamentoRepository = equipamentoRepository;
+            _mqttService = mqttService;
+            _appConfigRepository = appConfigRepository;
         }
-        
+
         private bool IsAjaxRequest()
         {
-            return Request.Headers["X-Requested-With"] == "XMLHttpRequest"; 
+            return Request.Headers["X-Requested-With"] == "XMLHttpRequest";
         }
 
         // GET: /Equipamentos/Index
@@ -32,9 +38,9 @@ namespace VigiLant.Controllers
             var equipamentos = _equipamentoRepository.GetAll();
             return View(equipamentos);
         }
-        
+
         // GET: /Equipamentos/Conectar
-        public IActionResult Conectar()
+        public async Task<IActionResult> Conectar()
         {
             if (IsAjaxRequest())
             {
@@ -46,41 +52,52 @@ namespace VigiLant.Controllers
         // POST: /Equipamentos/Conectar
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Conectar(string identificador)
+        public async Task<IActionResult> Conectar(string identificador)
         {
-            if (string.IsNullOrWhiteSpace(identificador))
+            if (string.IsNullOrEmpty(identificador))
             {
-                ModelState.AddModelError("identificador", "O identificador do equipamento é obrigatório para conectar.");
+                ModelState.AddModelError("identificador", "O identificador é obrigatório.");
+                return PartialView("_ConectarEquipamentoPartial", new Equipamento());
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    var novoEquipamento = _equipamentoRepository.Conectar(identificador);
+                // 1. Cadastra o equipamento no DB com status inicial 'AguardandoDados'
+                var novoEquipamento = _equipamentoRepository.Conectar(identificador);
 
-                    if (IsAjaxRequest())
-                    {
-                        return Ok(new { success = true, id = novoEquipamento.Id }); 
-                    }
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (InvalidOperationException ex)
+                // 2. Carrega as configurações do broker (Topic Wildcard para publicação)
+                var config = _appConfigRepository.GetConfig();
+                if (config == null)
                 {
-                    ModelState.AddModelError(string.Empty, ex.Message); 
+                    throw new InvalidOperationException("Configuração do broker (AppConfig) não encontrada.");
                 }
-                catch (Exception ex)
+
+                // 3. Monta o tópico de comando (ex: vigilant/command/SENS_01)
+                // Usamos a parte antes do '#' do MqttTopicWildcard
+                var baseTopic = config.MqttTopicWildcard.Split('/')[0]; // Ex: "vigilant"
+                var publishTopic = $"{baseTopic}/command/{identificador}"; // Ex: vigilant/command/SENS_01
+
+                // 4. Manda o comando "Conectar" para o broker, que o dispositivo deve ouvir.
+                await _mqttService.PublishAsync(publishTopic, "CONECTAR");
+
+                if (IsAjaxRequest())
                 {
-                    ModelState.AddModelError(string.Empty, $"Erro ao tentar cadastrar: {ex.Message}");
+                    // Retorna Status 200/OK para o JavaScript (Sucesso)
+                    return Ok(new { equipamentoId = novoEquipamento.Id, nome = novoEquipamento.Nome });
                 }
+                return RedirectToAction(nameof(Index));
             }
-            
-            if (IsAjaxRequest())
+            catch (InvalidOperationException ex)
             {
-                Response.StatusCode = 400; 
+                // Captura o erro do MQTT Service se não estiver conectado ou erro de DB
+                ModelState.AddModelError(string.Empty, $"Falha: {ex.Message}");
                 return PartialView("_ConectarEquipamentoPartial", new Equipamento() { IdentificadorBroker = identificador });
             }
-            return View(new Equipamento());
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Erro inesperado ao conectar: {ex.Message}");
+                return PartialView("_ConectarEquipamentoPartial", new Equipamento() { IdentificadorBroker = identificador });
+            }
         }
 
         // ---------------------------------------------
@@ -129,7 +146,7 @@ namespace VigiLant.Controllers
             }
             return View(equipamento);
         }
-        
+
         // GET: /Equipamentos/GetRealTimeData/5
         [HttpGet]
         public IActionResult GetRealTimeData(int id)
@@ -141,13 +158,14 @@ namespace VigiLant.Controllers
             }
 
             // Retorna um JSON com os dados ATUALIZADOS DO BANCO
-            return Json(new 
+            return Json(new
             {
                 nome = equipamento.Nome,
                 localizacao = equipamento.Localizacao,
                 status = equipamento.Status.ToString(),
                 tipoSensor = equipamento.TipoSensor.ToString(),
-                ultimaAtualizacao = equipamento.UltimaAtualizacao.ToString("dd/MM/yyyy HH:mm:ss")
+                ultimaAtualizacao = equipamento.UltimaAtualizacao.ToString("dd/MM/yyyy HH:mm:ss"),
+                valorMedicao = equipamento.UltimaMedicao
             });
         }
 
@@ -161,14 +179,14 @@ namespace VigiLant.Controllers
             var equipamento = _equipamentoRepository.GetById(id);
             if (equipamento == null)
             {
-                 if (IsAjaxRequest())
+                if (IsAjaxRequest())
                 {
                     Response.StatusCode = 404;
                     return Content("Equipamento não encontrado para exclusão.");
                 }
                 return NotFound();
             }
-            
+
             if (IsAjaxRequest())
             {
                 // Retorna a view parcial de confirmação de exclusão
@@ -183,13 +201,13 @@ namespace VigiLant.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
             _equipamentoRepository.Delete(id);
-            
+
             // Opcional: Se necessário, enviar uma mensagem de "desativação" ao Broker aqui.
 
             if (IsAjaxRequest())
             {
                 // Retorna Status 200/OK para o JavaScript (Sucesso)
-                return Ok(); 
+                return Ok();
             }
             return RedirectToAction(nameof(Index));
         }

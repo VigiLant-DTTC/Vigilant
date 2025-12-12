@@ -6,30 +6,35 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
+using MQTTnet.Protocol;
 using MQTTnet.Client;
 using Newtonsoft.Json;
 using VigiLant.Contratos;
 using VigiLant.Models.Payload;
 using VigiLant.Models.Enum;
+using Microsoft.AspNetCore.SignalR;
+using VigiLant.Hubs;
 
 namespace VigiLant.Services
 {
-    public class MqttClientService : BackgroundService
+    public class MqttClientService : BackgroundService, IMqttService
     {
         private readonly ILogger<MqttClientService> _logger;
         private readonly IServiceProvider _serviceProvider;
         private IMqttClient _mqttClient;
         private MqttFactory _mqttFactory;
+        private readonly IHubContext<MedicaoHub> _medicaoHubContext;
 
         // Propriedades para as configurações que serão carregadas do DB
         private string _mqttHost;
         private int _mqttPort;
         private string _mqttTopicWildcard;
 
-        public MqttClientService(ILogger<MqttClientService> logger, IServiceProvider serviceProvider)
+        public MqttClientService(ILogger<MqttClientService> logger, IServiceProvider serviceProvider, IHubContext<MedicaoHub> medicaoHubContext)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
+            _medicaoHubContext = medicaoHubContext;
             _mqttFactory = new MqttFactory();
             _mqttClient = _mqttFactory.CreateMqttClient();
 
@@ -37,68 +42,85 @@ namespace VigiLant.Services
             _mqttClient.DisconnectedAsync += HandleDisconnectedAsync;
         }
 
+        public async Task PublishAsync(string topic, string payload, CancellationToken cancellationToken = default)
+        {
+            if (!_mqttClient.IsConnected)
+            {
+                _logger.LogWarning($"Não foi possível publicar no tópico '{topic}': Cliente MQTT não está conectado.");
+                // Lança exceção para o Controller capturar e notificar o usuário (IMPORTANTE!)
+                throw new InvalidOperationException("Cliente MQTT não está conectado. Tente recarregar a página ou verifique as configurações do broker.");
+            }
+
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(payload)
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+                .WithRetainFlag(false)
+                .Build();
+
+            await _mqttClient.PublishAsync(message, cancellationToken);
+            _logger.LogInformation($"Mensagem publicada no tópico: {topic} com payload: {payload}");
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // O loop principal que garante que o serviço tente se conectar e se manter conectado
             while (!stoppingToken.IsCancellationRequested)
             {
                 if (!_mqttClient.IsConnected)
                 {
-                    // 1. CARREGA AS CONFIGURAÇÕES DO BANCO DE DADOS (DENTRO DE UM SCOPE)
+                    _logger.LogInformation("Cliente MQTT tentando se conectar...");
                     try
                     {
+                        // 1. Carregar a configuração do banco de dados (AppConfig)
                         using (var scope = _serviceProvider.CreateScope())
                         {
-                            var configRepository = scope.ServiceProvider.GetRequiredService<IAppConfigRepository>();
-                            var config = configRepository.GetConfig();
+                            var configRepo = scope.ServiceProvider.GetRequiredService<IAppConfigRepository>();
+                            var config = configRepo.GetConfig();
 
-                            _mqttHost = config.MqttHost;
-                            // CONVERSÃO EXPLÍCITA DE ENUM PARA INT
-                            _mqttPort = (int)config.MqttPort;
-                            _mqttTopicWildcard = config.MqttTopicWildcard;
-
-                            _logger.LogInformation($"Configurações carregadas: Host={_mqttHost}, Porta={_mqttPort}, Topic={_mqttTopicWildcard}");
+                            if (config != null)
+                            {
+                                _mqttHost = config.MqttHost;
+                                _mqttPort = (int)config.MqttPort;
+                                _mqttTopicWildcard = config.MqttTopicWildcard;
+                            }
+                            else
+                            {
+                                _logger.LogError("Configuração do AppConfig não encontrada.");
+                                await Task.Delay(5000, stoppingToken);
+                                continue;
+                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Erro ao carregar configurações do AppConfigRepository. Tentando novamente em 10 segundos...");
-                        await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
-                        continue;
-                    }
 
-                    // 2. TENTA CONECTAR COM AS NOVAS CONFIGURAÇÕES
-                    try
-                    {
+                        // 2. Tentar Conectar
                         var options = new MqttClientOptionsBuilder()
-                            .WithTcpServer(_mqttHost, _mqttPort) // Usa as configurações do DB
-                            .WithClientId(Guid.NewGuid().ToString())
-                            .WithCleanSession()
+                            .WithTcpServer(_mqttHost, _mqttPort)
+                            .WithClientId($"VigiLantServer_{Guid.NewGuid()}")
+                            .WithKeepAlivePeriod(TimeSpan.FromSeconds(30))
                             .Build();
 
-                        var result = await _mqttClient.ConnectAsync(options, stoppingToken);
+                        await _mqttClient.ConnectAsync(options, stoppingToken);
 
-                        if (result.ResultCode == MQTTnet.Client.MqttClientConnectResultCode.Success)
+                        // 3. Subscrever
+                        if (_mqttClient.IsConnected)
                         {
-                            _logger.LogInformation($"Conectado ao Broker MQTT em {_mqttHost}:{_mqttPort}.");
+                            // Usa o SubscribeOptionsBuilder (corrigindo o erro de compilação anterior)
+                            var subscribeOptions = _mqttFactory.CreateSubscribeOptionsBuilder()
+                                .WithTopicFilter(f => f
+                                    .WithTopic(_mqttTopicWildcard) // vigilant/data/#
+                                    .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce))
+                                .Build();
 
-                            // 3. SE INSCREVE NO TÓPICO CONFIGURÁVEL
-                            await _mqttClient.SubscribeAsync(_mqttTopicWildcard, MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce, stoppingToken);
-                            _logger.LogInformation($"Subscrito ao tópico: {_mqttTopicWildcard}");
-                        }
-                        else
-                        {
-                            _logger.LogWarning($"Falha na conexão MQTT. Código: {result.ResultCode}. Tentando novamente em 5 segundos...");
+                            await _mqttClient.SubscribeAsync(subscribeOptions, stoppingToken);
+
+                            _logger.LogInformation($"Cliente MQTT conectado e subscrito em: {_mqttTopicWildcard}");
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Erro ao conectar ou subscrever ao Broker MQTT.");
+                        _logger.LogError(ex, $"Falha na conexão/subscrição MQTT. Tentando novamente em 5s.");
                     }
                 }
-
-                // Espera 5 segundos antes de verificar a conexão novamente
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                await Task.Delay(5000, stoppingToken);
             }
         }
 
@@ -111,44 +133,53 @@ namespace VigiLant.Services
 
         private async Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e)
         {
-            var topic = e.ApplicationMessage.Topic;
             var payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment.ToArray());
-
-            _logger.LogInformation($"Mensagem recebida no tópico '{topic}': {payload}");
+            _logger.LogInformation($"Mensagem MQTT recebida no tópico {e.ApplicationMessage.Topic}: {payload}");
 
             try
             {
-                // Certifique-se de que a classe RealTimeDataPayload está acessível.
+                // Desserializa o payload para o modelo RealTimeDataPayload
                 var data = JsonConvert.DeserializeObject<RealTimeDataPayload>(payload);
 
-                if (data == null || string.IsNullOrWhiteSpace(data.Identificador))
+                if (data != null)
                 {
-                    _logger.LogWarning("Payload MQTT inválido ou Identificador ausente.");
-                    return;
-                }
-
-                // Cria um escopo para resolver o IEquipamentoRepository (necessário para DbContext/Scoped services)
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    var repo = scope.ServiceProvider.GetRequiredService<IEquipamentoRepository>();
-
-                    // Busca o equipamento usando o IdentificadorBroker do payload
-                    var equipamento = repo.GetAll().FirstOrDefault(eq => eq.IdentificadorBroker == data.Identificador);
-
-                    if (equipamento != null)
+                    using (var scope = _serviceProvider.CreateScope())
                     {
-                        repo.AtualizarDadosEmTempoReal(
-                            equipamento.Id,
-                            (StatusEquipament)data.Status,
-                            data.Localizacao,
-                            data.Nome,
-                            (TipoSensores)data.TipoSensor
-                        );
-                        _logger.LogInformation($"Equipamento #{equipamento.Id} ({data.Identificador}) atualizado com dados reais.");
-                    }
-                    else
-                    {
-                        _logger.LogWarning($"Dados recebidos para identificador não cadastrado: {data.Identificador}");
+                        var repo = scope.ServiceProvider.GetRequiredService<IEquipamentoRepository>();
+
+                        // Busca o equipamento usando o IdentificadorBroker do payload
+                        var equipamento = repo.GetAll().FirstOrDefault(eq => eq.IdentificadorBroker == data.Identificador);
+
+                        if (equipamento != null)
+                        {
+                            // Chamada ao Repositório para atualizar os dados
+                            repo.AtualizarDadosEmTempoReal(
+                                equipamento.Id,
+                                (StatusEquipament)data.Status,
+                                data.Localizacao,
+                                data.Nome,
+                                (TipoSensores)data.TipoSensor,
+                                data.ValorMedicao // <--- NOVO: Inclui o valor da medição
+                            );
+                            _logger.LogInformation($"Equipamento #{equipamento.Id} ({data.Identificador}) atualizado com dados reais.");
+
+                            // Publica no SignalR para atualizar a interface (Index.cshtml)
+                            var novaMedicao = new
+                            {
+                                Id = equipamento.Id,
+                                Nome = data.Nome,
+                                Localizacao = data.Localizacao,
+                                Status = (StatusEquipament)data.Status,
+                                UltimaAtualizacao = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                                ValorMedicao = data.ValorMedicao
+                            };
+
+                            await _medicaoHubContext.Clients.All.SendAsync("ReceberAtualizacaoEquipamento", novaMedicao);
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"Dados recebidos para identificador não cadastrado: {data.Identificador}");
+                        }
                     }
                 }
             }

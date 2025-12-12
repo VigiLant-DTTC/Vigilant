@@ -14,11 +14,11 @@ namespace VigiLant.Contratos
         void Add(Equipamento equipamento);
         void Update(Equipamento equipamento);
         void Delete(int id);
-        
+
         // Método de Conexão: Registra o equipamento para monitoramento
         Equipamento Conectar(string identificadorUnico);
-        
+
         // Método de Atualização: Chamado PELO SERVIÇO MQTT para salvar o dado real
-        void AtualizarDadosEmTempoReal(int id, StatusEquipament status, string localizacao, string nome, TipoSensores tipoSensor);
+        void AtualizarDadosEmTempoReal(int id, StatusEquipament status, string localizacao, string nome, TipoSensores tipoSensor, string ultimaMedicao);
     }
 }

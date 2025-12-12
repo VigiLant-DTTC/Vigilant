@@ -12,8 +12,8 @@ using VigiLant.Data;
 namespace VigiLant.Migrations
 {
     [DbContext(typeof(BancoCtx))]
-    [Migration("20251128002319_EquipeNew")]
-    partial class EquipeNew
+    [Migration("20251212044831_totally")]
+    partial class totally
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,30 @@ namespace VigiLant.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("VigiLant.Models.AppConfig", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MqttHost")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("MqttPort")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MqttTopicWildcard")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppConfigs");
+                });
+
             modelBuilder.Entity("VigiLant.Models.Colaborador", b =>
                 {
                     b.Property<int>("Id")
@@ -33,9 +57,8 @@ namespace VigiLant.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Cargo")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Cargo")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("DataAdmissao")
                         .HasColumnType("datetime(6)");
@@ -52,9 +75,15 @@ namespace VigiLant.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("StatusAcesso")
+                        .HasColumnType("int");
+
                     b.Property<string>("Telefone")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -69,28 +98,11 @@ namespace VigiLant.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BrokerHost")
+                    b.Property<string>("IdentificadorBroker")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<int>("BrokerPort")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("DataUltimaManutencao")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Localizacao")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("MqttTopic")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -98,41 +110,22 @@ namespace VigiLant.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
-                    b.Property<string>("TipoSensor")
+                    b.Property<int>("TipoSensor")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UltimaAtualizacao")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UltimaMedicao")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
                     b.ToTable("Equipamentos");
-                });
-
-            modelBuilder.Entity("VigiLant.Models.MqttConfiguration", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("BaseTopic")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("BrokerHost")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("BrokerPort")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MqttConfigurations");
                 });
 
             modelBuilder.Entity("VigiLant.Models.Relatorio", b =>
@@ -153,11 +146,11 @@ namespace VigiLant.Migrations
                     b.Property<int>("GeradoPorColaboradorId")
                         .HasColumnType("int");
 
-                    b.Property<string>("TipoRelatorio")
+                    b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Titulo")
+                    b.Property<string>("TipoRelatorio")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -181,6 +174,10 @@ namespace VigiLant.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Equipamento")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("NivelGravidade")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -192,6 +189,9 @@ namespace VigiLant.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("TipoRisco")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

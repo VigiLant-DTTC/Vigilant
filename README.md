@@ -59,14 +59,13 @@ Para testar a conexão do broker sem um sensor e asp, configure o MQTT Broker do
 logo apos use o padrão:
 
 {
-    "Identificador": "SENS_001",
-    "Nome": "SENSOR TREE",
-    "Localizacao": "Rack Principal",
-    "TipoSensor": 5,
-    "Status": 1
+  "Identificador": "SENSOR_01",
+  "Nome": "Medidor de Corrente Principal",
+  "Localizacao": "Painel Elétrico B1",
+  "TipoSensor": 1, 
+  "Status": 1,
+  "ValorMedicao": "20.5 A" 
 }
-
-MQTTX
 
 ## Recursos-Chave
 
@@ -77,18 +76,18 @@ Gestão de Riscos Intuitiva	Interface simplificada para registro de riscos por q
 Monitoramento Integrado	Permite o cadastro e monitoramento de equipamentos, com emissão de alertas e notificações automáticas em caso de falhas.	Garante resposta rápida e eficiente.
 
 ## Licença
-`Vigilant` possui licença MIT — veja o arquivo `LICENSE` no repositório.
+`Vigilant` ainda não possui licença.
 
 ---
 
 ## Equipe
 
-Este projeto foi desenvolvido por estudantes do SENAI, com a participação de:
+Este projeto foi desenvolvido por estudantes desenvolvedores do SENAI, com a participação de:
 Nome do Componente	Instituição de Origem
-David Lima	SENAI SEDE, Camaçari, BA
-Misla Brito	SENAI SEDE, Camaçari, BA
-Orlando Lucas	SENAI SEDE, Camaçari, BA
-Tiago Andrade	SENAI SEDE, Camaçari, BA
-Yuri Silva	SENAI SEDE, Camaçari, BA
+David Lima	- SENAI SEDE, Camaçari, BA
+Misla Brito	- SENAI SEDE, Camaçari, BA
+Orlando Lucas - SENAI SEDE, Camaçari, BA
+Tiago Andrade - SENAI SEDE, Camaçari, BA
+Yuri Silva	- SENAI SEDE, Camaçari, BA
 
 

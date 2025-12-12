@@ -7,5 +7,6 @@ namespace VigiLant.Models.Payload
         public string Localizacao { get; set; }
         public int TipoSensor { get; set; }
         public int Status { get; set; }
+        public string ValorMedicao { get; set; }
     }
 }

@@ -2,6 +2,7 @@ namespace VigiLant.Models.Enum;
 
 public enum TipoSensores
 {
+    Carregando = 0,
     Temperatura = 1 ,
     Pressao = 2,
     QualidadeArGas = 3,

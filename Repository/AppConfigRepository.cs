@@ -16,33 +16,28 @@ namespace VigiLant.Repository
             _context = context;
         }
 
-        public AppConfig GetConfig()
+        public AppConfig? GetConfig()
         {
-            // Tenta obter a configuração existente (sempre Id=1)
-            var config = _context.AppConfigs.FirstOrDefault(c => c.Id == 1);
-
-            if (config == null)
-            {
-                // Se não existir, cria o registro inicial com os valores default
-                config = new AppConfig();
-                _context.AppConfigs.Add(config);
-                _context.SaveChanges();
-            }
-
-            return config;
+            return _context.AppConfigs.FirstOrDefault();
         }
 
         public void UpdateConfig(AppConfig config)
         {
-            var existing = _context.AppConfigs.FirstOrDefault(c => c.Id == 1);
+            var existing = GetConfig();
             if (existing != null)
             {
                 existing.MqttHost = config.MqttHost;
-                existing.MqttTopicWildcard = config.MqttTopicWildcard;
                 existing.MqttPort = config.MqttPort;
+                existing.MqttTopicWildcard = config.MqttTopicWildcard;
+                
                 _context.AppConfigs.Update(existing);
-                _context.SaveChanges();
             }
+            else
+            {
+                config.Id = 1;
+                _context.AppConfigs.Add(config);
+            }
+            _context.SaveChanges();
         }
     }
 }

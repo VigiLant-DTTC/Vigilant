@@ -144,7 +144,7 @@ public class ContaController : Controller
 
         // 6. VINCULAR: Atualizar o registro do Colaborador com o novo UsuarioId e Status
         colaborador.UsuarioId = novoUsuario.Id;
-        colaborador.StatusAcesso = StatusVinculacao.Vinculado;
+        colaborador.StatusAcesso = StatusVinculacao.Ativo;
         _colaboradorRepository.UpdateStatusVinculacao(colaborador);
 
         // 7. Sucesso! Redireciona com mensagem de sucesso de vinculação
