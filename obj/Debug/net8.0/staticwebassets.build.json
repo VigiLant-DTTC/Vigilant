@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "cVRfudkQFEyhkak2WuvwtgL4Mc9favr+EJZBxabLgpw=",
+  "Hash": "IE7ribO4fJPaunmUZqKxoAnV6j02J0RFbLZ40WGMlMw=",
   "Source": "VigiLant",
   "BasePath": "_content/VigiLant",
   "Mode": "Default",
@@ -53,6 +53,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "E:\\Tiago\\Documents\\VigiLant\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\VigiLant.bundle.scp.css"
+    },
+    {
+      "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\config.css",
+      "SourceId": "VigiLant",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\",
+      "BasePath": "_content/VigiLant",
+      "RelativePath": "css/config.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\config.css"
     },
     {
       "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\Conta.css",

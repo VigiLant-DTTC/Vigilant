@@ -12,11 +12,13 @@ namespace VigiLant.Controllers
     {
         private readonly IAnaliseRepository _analiseRepository;
         private readonly IRiscoRepository _riscoRepository;
+        private readonly IIAService _iaService;
 
-        public AnalisesController(IAnaliseRepository analiseRepository, IRiscoRepository riscoRepository)
+        public AnalisesController(IAnaliseRepository analiseRepository, IRiscoRepository riscoRepository, IIAService iaService)
         {
             _analiseRepository = analiseRepository;
             _riscoRepository = riscoRepository;
+            _iaService = iaService;
         }
 
         private bool IsAjaxRequest()
@@ -45,8 +47,8 @@ namespace VigiLant.Controllers
 
         // POST: /Analises/GerarAnalise/5
         [HttpPost]
-        [ValidateAntiForgeryToken] 
-        public IActionResult GerarAnalise(int riscoId)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GerarAnalise(int riscoId)
         {
             var risco = _riscoRepository.GetById(riscoId);
             if (risco == null)
@@ -56,14 +58,17 @@ namespace VigiLant.Controllers
                 return NotFound();
             }
 
-            // ... (Seu código PLACEHOLDER para chamar a IA) ...
+            var resultadoIA = await _iaService.GerarAnaliseDeRisco(risco.Nome, risco.Descricao);
+
+            var previsao = resultadoIA.Item1;
+            var solucoes = resultadoIA.Item2;
 
             var novaAnalise = new Analise
             {
                 RiscoId = risco.Id,
                 DataAnalise = DateTime.Now,
-                PrevisaoRiscosFuturos = "Simulação da IA: Previsão de falha em 90 dias.",
-                SolucoesSugeridas = "Simulação da IA: Requer manutenção preventiva e troca de peça X.",
+                PrevisaoRiscosFuturos = previsao, 
+                SolucoesSugeridas = solucoes,     
                 StatusAnalise = "Gerada"
             };
 

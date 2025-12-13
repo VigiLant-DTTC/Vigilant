@@ -107,11 +107,10 @@ Dashboard Centralizado	Painel principal com indicadores de segurança (KPIs) em 
 Gestão de Riscos Intuitiva	Interface simplificada para registro de riscos por qualquer colaborador, atribuindo prioridade e status de forma fácil.	Aumenta a adesão e o empoderamento dos colaboradores.
 Monitoramento Integrado	Permite o cadastro e monitoramento de equipamentos, com emissão de alertas e notificações automáticas em caso de falhas.	Garante resposta rápida e eficiente.
 
-## Tecnologias
+## Tecnologias-&-Bibliotecas
 Abaixo tem algumas tecnologias utilizazadas na formaçao ou testes do vigilant:
 API - `OpenAI` - Prevenções e soluções.
 CONEXÃO `BROKER-MQTTX` - Para conversa com sensores.
-
 
 ## Licença
 `Vigilant` ainda não possui licença.

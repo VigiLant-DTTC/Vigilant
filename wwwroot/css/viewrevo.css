@@ -16,7 +16,15 @@
     }
 }
 
-/* --- ELEMENTOS DE FORMULÁRIO GERAIS DENTRO DA MODAL --- */
+.description-text {
+    max-height: 250px; 
+    overflow-y: auto;  
+    word-break: break-word; 
+    border: 1px solid #ddd; 
+    padding: 15px;
+    background-color: #fcfcfc;
+    border-radius: 4px;
+}
 
 .modal-body h4 {
     font-size: 1.35em;

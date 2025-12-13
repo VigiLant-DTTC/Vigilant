@@ -30,7 +30,7 @@ namespace VigiLant.Config
                         Nome = "Adm",
                         Email = emailAdmin,
                         // Usar o Hash Service para a senha (ex: "Admin123!")
-                        SenhaHash = hashService.GerarHash("Adm123"),
+                        SenhaHash = hashService.GerarHash("adm123"),
                         cargo = Cargo.Administrador,
                     };
 

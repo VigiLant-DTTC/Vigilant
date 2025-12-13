@@ -17,8 +17,13 @@ namespace VigiLant.Controllers
             _configRepository = configRepository;
         }
 
-        // GET: /Configuracoes/Index
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        // GET: /Configuracoes/Index
+        public IActionResult ConfigBroker()
         {
             var config = _configRepository.GetConfig();
             return View(config);
@@ -27,7 +32,7 @@ namespace VigiLant.Controllers
         // POST: /Configuracoes/Index
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(AppConfig config)
+        public IActionResult ConfigBroker(AppConfig config)
         {
             config.Id = 1;
 

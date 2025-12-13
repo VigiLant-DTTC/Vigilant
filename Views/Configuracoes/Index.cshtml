@@ -1,15 +1,15 @@
-@model VigiLant.Models.AppConfig
 @using VigiLant.Models.Enum
 
 @{
-    ViewData["Title"] = "Configurações do Sistema";
+    ViewData["Title"] = "Configurações";
 }
 
-<link rel="stylesheet" href="/css/viewrevo.css" asp-append-version="true" />
+<link rel="stylesheet" href="/css/config.css" asp-append-version="true" />
+
 
 <div class="PageFlex">
     <div class="page-header">
-        <h1 class="page-title">Configurações do Sistema</h1>
+        <h1 class="page-title">Configurações</h1>
         <div class="breadcrumb">
             <a href="@Url.Action("Index", "Home")">Dashboard</a>
             <span class="separator">/</span>
@@ -18,58 +18,68 @@
     </div>
 </div>
 
-<div class="card-container">
-    <div class="card">
-        <h4 class="card-title">Configurações MQTT Broker</h4>
-        <p class="card-subtitle">Ajuste o host e o tópico para conectar a um broker MQTT diferente.</p>
-
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success mt-3" role="alert">
-                <i class="fas fa-check-circle"></i> @ViewBag.SuccessMessage
+<div class="mobile-settings-container">
+    
+    <a href="@Url.Action("ConfigBroker", "Configuracoes")" class="settings-item">
+        <div class="settings-content">
+            <div class="settings-icon icon-primary">
+                <i class="fas fa-satellite-dish"></i>
             </div>
-        }
-
-        <form asp-action="Index" method="post">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <input type="hidden" asp-for="Id" />
-
-            <div class="form-group mb-3">
-                <label asp-for="MqttHost" class="form-label"></label>
-                <input asp-for="MqttHost" class="form-control" />
-                <span asp-validation-for="MqttHost" class="text-danger"></span>
+            <div class="settings-text">
+                <span class="settings-title">Configurações MQTT Broker</span>
+                <span class="settings-subtitle">Ajuste o host e o tópico para conectar ao broker.</span>
             </div>
+        </div>
+        <div class="settings-chevron">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </a>
 
-            <div class="form-group mb-3">
-                <label asp-for="MqttPort" class="form-label"></label>
-                <select asp-for="MqttPort" asp-items="Html.GetEnumSelectList<MqttPorta>()" class="form-select"></select>
-                <span asp-validation-for="MqttPort" class="text-danger"></span>
-                <small class="form-text text-muted">A porta define o tipo de conexão: TCP padrão (1883) ou
-                    Segura/WebSocket (outras).</small>
+    <a href="#" class="settings-item">
+        <div class="settings-content">
+            <div class="settings-icon icon-secondary">
+                <i class="fas fa-user-shield"></i>
             </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="MqttTopicWildcard" class="form-label"></label>
-                <input asp-for="MqttTopicWildcard" class="form-control" />
-                <span asp-validation-for="MqttTopicWildcard" class="text-danger"></span>
-                <small class="form-text text-muted">Ex: <code>vigilant/data/#</code> (o `#` capta todos os
-                    sub-tópicos)</small>
+            <div class="settings-text">
+                <span class="settings-title">Usuários e Permissões</span>
+                <span class="settings-subtitle">Gerenciar acesso e papéis no sistema.</span>
             </div>
+        </div>
+        <div class="settings-chevron">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </a>
 
-            <div class="form-group mt-4 text-end">
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-save"></i> Salvar Configurações
-                </button>
+    <a href="#" class="settings-item">
+        <div class="settings-content">
+            <div class="settings-icon icon-info">
+                <i class="fas fa-bell"></i>
             </div>
-        </form>
+            <div class="settings-text">
+                <span class="settings-title">Configurações de Notificação</span>
+                <span class="settings-subtitle">Definir limites e canais para alertas.</span>
+            </div>
+        </div>
+        <div class="settings-chevron">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    </a>
 
+    <div class="settings-item settings-item-switch">
+        <div class="settings-content">
+            <div class="settings-icon icon-secondary" style="background-color: #28a745;">
+                <i class="fas fa-moon"></i>
+            </div>
+            <div class="settings-text">
+                <span class="settings-title">Modo Noturno</span>
+                <span class="settings-subtitle">Ativar tema escuro para a interface.</span>
+            </div>
+        </div>
+
+        <label class="switch">
+            <input type="checkbox">
+            <span class="slider round"></span>
+        </label>
     </div>
-</div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+</div>
