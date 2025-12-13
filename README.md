@@ -15,6 +15,7 @@ O projeto VIGILANT é uma solução de software desenvolvida para modernizar e t
 * [Guia de configuração](#GuiaConfig)
 * [Testes de Sistema](#Testes)
 * [Recursos-Chave](#Recursos-Chave)
+* [Tecnologias Usadas](#Tecnologias)
 * [Licença](#Licença)
 * [Equipe](#Equipe)
 
@@ -42,8 +43,8 @@ dotnet watch run
 
 Apos isso faça login no sistema com conta adm
 ```bash
-Email: admin@vigilant.com.br
-Senha: Admin123
+Email: adm@vigilant.com.br
+Senha: adm123
 ```
 
 ##  Problema 
@@ -87,6 +88,7 @@ Ex: Vigilant/data/ (para mandar informações do sensor)
 
 De um nome a seu sensor: Ex: Vigilant/command/SENS_01
 
+```bash
 {
   "Identificador": "SENS_01",
   "Nome": "Motor Principal",
@@ -95,6 +97,7 @@ De um nome a seu sensor: Ex: Vigilant/command/SENS_01
   "Status": 1,
   "ValorMedicao": "15.5A"
 }
+```
 
 ## Recursos-Chave
 
@@ -103,6 +106,12 @@ Análise Preditiva (IA)	O diferencial central. Utiliza IA para analisar dados hi
 Dashboard Centralizado	Painel principal com indicadores de segurança (KPIs) em tempo real, fornecendo visão instantânea do status da produção.	Melhora a tomada de decisão estratégica.
 Gestão de Riscos Intuitiva	Interface simplificada para registro de riscos por qualquer colaborador, atribuindo prioridade e status de forma fácil.	Aumenta a adesão e o empoderamento dos colaboradores.
 Monitoramento Integrado	Permite o cadastro e monitoramento de equipamentos, com emissão de alertas e notificações automáticas em caso de falhas.	Garante resposta rápida e eficiente.
+
+## Tecnologias
+Abaixo tem algumas tecnologias utilizazadas na formaçao ou testes do vigilant:
+API - `OpenAI` - Prevenções e soluções.
+CONEXÃO `BROKER-MQTTX` - Para conversa com sensores.
+
 
 ## Licença
 `Vigilant` ainda não possui licença.
