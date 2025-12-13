@@ -47,10 +47,9 @@
 }
 
 /* Cores específicas para os ícones */
-.icon-primary { background-color: #007bff; }
-.icon-secondary { background-color: #6c757d; }
-.icon-info { background-color: #17a2b8; }
-/* Adicione mais classes conforme a necessidade */
+.icon-primary { background-color: rgb(233, 0, 0); }
+.icon-secondary { background-color: #000000; }
+.icon-info { background-color: rgb(233, 0, 0); }
 
 /* Texto Principal e Descrição */
 .settings-text {

@@ -32,7 +32,7 @@
         </div>
         <div class="stat-info">
             <h3>@ViewBag.TotalRiscos</h3>
-            <p>Risco Identificado</p>
+            <p>Riscos Identificados</p>
         </div>
     </div>
 
@@ -42,17 +42,17 @@
         </div>
         <div class="stat-info">
             <h3>@ViewBag.TotalEquipamentos</h3>
-            <p>Equipamentos check</p>
+            <p>Total de Equipamentos</p>
         </div>
     </div>
 
     <div class="stat-card">
         <div class="stat-icon red">
-            <i class="fas fa-times-circle"></i>
+            <i class="fas fa-user"></i>
         </div>
         <div class="stat-info">
-            <h3>@ViewBag.AnalisesPeriodos</h3>
-            <p>Análise de Períodos</p>
+            <h3>@ViewBag.TotalColaboradores</h3>
+            <p>Total de Colaboradores</p>
         </div>
     </div>
 
@@ -61,8 +61,8 @@
             <i class="fas fa-file-alt"></i>
         </div>
         <div class="stat-info">
-            <h3>@ViewBag.RelatoriosIncidentes</h3>
-            <p>Relatórios de Incidentes</p>
+            <h3>@ViewBag.TotalRelatorios</h3>
+            <p>Total de Relatórios</p>
         </div>
     </div>
 </div>
@@ -95,41 +95,66 @@
         <div class="card-header">
             <h2 class="card-title">
                 <i class="fas fa-clipboard-list"></i>
-                Análise e Solução urgente
+                Análises da IA (@ViewBag.MaxAnalisesGeradas)
             </h2>
             <div class="card-actions">
-                <button><i class="fas fa-filter"></i></button>
-                <button><i class="fas fa-plus"></i></button>
+                <button type="button" class="btn-primary" data-action-type="create-modal"
+                    data-url="@Url.Action("SelectRisco", "Analises")" data-title="Gerar Nova Análise com IA"
+                    data-form-id="selectRiscoForm">
+                    <i class="fas fa-plus"></i>
+                </button>
             </div>
         </div>
-        <ul class="urgent-list">
-            <li class="urgent-item">
-                <div class="urgent-item-content">
-                    <div class="check-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <p>Afaste-se de áreas de risco imediato</p>
+
+        @if (ViewBag.AnalisesUrgentes != null && ViewBag.AnalisesUrgentes.Count > 0)
+        {
+            <ul class="urgent-list">
+                @foreach (var analise in ViewBag.AnalisesUrgentes)
+                {
+                    <li class="urgent-item">
+                        <div class="urgent-item-content">
+                            <div class="check-icon">
+                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                            </div>
+                            <p>#@analise.Id | @analise.Risco.Nome - Status: @analise.StatusAnalise</p>
+                        </div>
+                        <button type="button" class="btn-icon btn-ajax-modal" title="Ver Detalhes" data-id="@analise.Id"
+                            data-action-type="details" data-controller-url="@Url.Content("~/Analises")"
+                            data-title="Detalhes da Análise #@analise.Id">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </li>
+                }
+            </ul>
+
+            @if (int.TryParse(ViewBag.MaxAnalisesGeradas.ToString(), out int maxAnalises) && maxAnalises > 4)
+            {
+                <div class="card-footer text-center">
+                    <a href="@Url.Action("Index", "Analises")" class="btn btn-sm btn-link">Ver todas as
+                        @ViewBag.MaxAnalisesGeradas Análises</a>
                 </div>
-                <button class="more-btn">⋮</button>
-            </li>
-            <li class="urgent-item">
-                <div class="urgent-item-content">
-                    <div class="check-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <p>Ligue para os serviços de emergência</p>
-                </div>
-                <button class="more-btn">⋮</button>
-            </li>
-            <li class="urgent-item">
-                <div class="urgent-item-content">
-                    <div class="check-icon">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <p>Isole a área para evitar a propagação do vazamento.</p>
-                </div>
-                <button class="more-btn">⋮</button>
-            </li>
-        </ul>
+            }
+        }
+        else
+        {
+            <div class="empty-list-message p-3">
+                <p>Nenhuma análise recente para ação urgente.</p>
+            </div>
+        }
     </div>
 </div>
+
+<div id="ajax-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 id="modalTitle">Título</h5>
+            <button id="closeModalButton" type="button" class="btn-close" aria-label="Close">X</button>
+        </div>
+        <div id="modalBody" class="modal-body"> </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/Partialjs.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+}

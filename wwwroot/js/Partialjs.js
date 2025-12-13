@@ -220,82 +220,81 @@ modalOverlay.addEventListener('click', function (e) {
 // --- EVENT LISTENERS INTERNOS (RE-BIND APÓS CARREGAR PARTIAL) ---
 
 function bindModalEventListeners(formId) {
-    // 1. Botão de Cancelar dentro das Partial Views
-    const cancelButton = document.getElementById('cancelModalButton'); // Usar ID genérico
-    if (cancelButton) {
-        // Remove e adiciona o listener para garantir que só haja um
-        cancelButton.removeEventListener('click', closeModal);
-        cancelButton.addEventListener('click', closeModal);
-    }
-
-    // 2. Reativação da Validação Unobtrusive (Crucial!)
-    // Apenas aplica no formulário carregado.
-    if (window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive) {
-        const form = document.getElementById(formId);
-        if (form) {
-            // Remove dados de validação antigos e re-analisa o formulário
-            jQuery(form).removeData('validator');
-            jQuery(form).removeData('unobtrusiveValidation');
-            jQuery.validator.unobtrusive.parse(form);
-
-            jQuery(form).off('submit').on('submit', function (e) {
-                e.preventDefault();
-                const $form = jQuery(this);
-
-                // Verificação de validação do lado do cliente
-                if (!$form.valid()) {
-                    return;
-                }
-
-                const originalButtonContent = $form.find('button[type="submit"]').html();
-                $form.find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processando...');
-
-                jQuery.ajax({
-                    url: $form.attr('action'),
-                    type: 'POST',
-                    data: $form.serialize(),
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    },
-                    success: function (response) {
-                        if (response.success && response.analiseId) {
-                            // Se a análise foi gerada (caso do GerarAnalise)
-                            alert(response.message || 'Operação realizada com sucesso!');
-                            closeModal();
-                            // Redirecionar para os detalhes da análise recém-criada
-                            window.location.href = '/Analises/Details/' + response.analiseId;
-                        } else {
-                            // Se for um CREATE ou EDIT (que retornaria a partial view com o formulário atualizado ou vazio)
-                            // ou se houver um erro de validação (tratado abaixo)
-
-                            // Recarrega a página se o sucesso for genérico (após um DELETE ou CREATE/EDIT bem-sucedido)
-                            alert(response.message || 'Operação realizada com sucesso!');
-                            closeModal();
-                            window.location.reload();
-                        }
-                    },
-                    error: function (xhr) {
-                        // Se o servidor retornar uma Partial View (geralmente em caso de erro de validação no CREATE/EDIT)
-                        if (xhr.getResponseHeader('Content-Type')?.includes('text/html')) {
-                            // Substitui o conteúdo do modal pelo novo HTML (a partial view com erros)
-                            modalBody.innerHTML = xhr.responseText;
-                            // Re-bind nos listeners da nova partial view
-                            bindModalEventListeners(formId);
-                        } else {
-                            // Erro genérico
-                            alert('Erro: ' + (xhr.responseJSON?.message || xhr.responseText || 'Ocorreu um erro desconhecido.'));
-                            closeModal();
-                        }
-                    },
-                    complete: function () {
-                        // Resetar o botão de submit (se não houve sucesso e redirecionamento)
-                        $form.find('button[type="submit"]').prop('disabled', false).html(originalButtonContent);
-                    }
-                });
-            });
+        const cancelButton = document.getElementById('cancelModalButton'); // Usar ID genérico
+        if (cancelButton) {
+            // Remove e adiciona o listener para garantir que só haja um
+            cancelButton.removeEventListener('click', closeModal);
+            cancelButton.addEventListener('click', closeModal);
         }
-    }
 
-    // 3. Submissão de Formulário (aplica o handler APENAS no formulário carregado)
-    handleFormSubmission(formId);
-}
+        // 2. Reativação da Validação Unobtrusive (Crucial!)
+        // Apenas aplica no formulário carregado.
+        if (window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive) {
+            const form = document.getElementById(formId);
+            if (form) {
+                // Remove dados de validação antigos e re-analisa o formulário
+                jQuery(form).removeData('validator');
+                jQuery(form).removeData('unobtrusiveValidation');
+                jQuery.validator.unobtrusive.parse(form);
+
+                jQuery(form).off('submit').on('submit', function (e) {
+                    e.preventDefault();
+                    const $form = jQuery(this);
+
+                    // Verificação de validação do lado do cliente
+                    if (!$form.valid()) {
+                        return;
+                    }
+
+                    const originalButtonContent = $form.find('button[type="submit"]').html();
+                    $form.find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processando...');
+
+                    jQuery.ajax({
+                        url: $form.attr('action'),
+                        type: 'POST',
+                        data: $form.serialize(),
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        success: function (response) {
+                            if (response.success && response.analiseId) {
+                                // Se a análise foi gerada (caso do GerarAnalise)
+                                alert(response.message || 'Operação realizada com sucesso!');
+                                closeModal();
+                                // Redirecionar para os detalhes da análise recém-criada
+                                window.location.href = '/Analises/Details/' + response.analiseId;
+                            } else {
+                                // Se for um CREATE ou EDIT (que retornaria a partial view com o formulário atualizado ou vazio)
+                                // ou se houver um erro de validação (tratado abaixo)
+
+                                // Recarrega a página se o sucesso for genérico (após um DELETE ou CREATE/EDIT bem-sucedido)
+                                alert(response.message || 'Operação realizada com sucesso!');
+                                closeModal();
+                                window.location.reload();
+                            }
+                        },
+                        error: function (xhr) {
+                            // Se o servidor retornar uma Partial View (geralmente em caso de erro de validação no CREATE/EDIT)
+                            if (xhr.getResponseHeader('Content-Type')?.includes('text/html')) {
+                                // Substitui o conteúdo do modal pelo novo HTML (a partial view com erros)
+                                modalBody.innerHTML = xhr.responseText;
+                                // Re-bind nos listeners da nova partial view
+                                bindModalEventListeners(formId);
+                            } else {
+                                // Erro genérico
+                                alert('Erro: ' + (xhr.responseJSON?.message || xhr.responseText || 'Ocorreu um erro desconhecido.'));
+                                closeModal();
+                            }
+                        },
+                        complete: function () {
+                            // Resetar o botão de submit (se não houve sucesso e redirecionamento)
+                            $form.find('button[type="submit"]').prop('disabled', false).html(originalButtonContent);
+                        }
+                    });
+                });
+            }
+        }
+
+        // 3. Submissão de Formulário (aplica o handler APENAS no formulário carregado)
+        handleFormSubmission(formId);
+    }
