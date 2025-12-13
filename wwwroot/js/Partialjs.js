@@ -238,8 +238,61 @@ function bindModalEventListeners(formId) {
             jQuery(form).removeData('unobtrusiveValidation');
             jQuery.validator.unobtrusive.parse(form);
 
-            // O código abaixo é apenas para fins de debug e pode ser removido
-            // console.log(`Validação Unobtrusive re-analisada para #${formId}`);
+            jQuery(form).off('submit').on('submit', function (e) {
+                e.preventDefault();
+                const $form = jQuery(this);
+
+                // Verificação de validação do lado do cliente
+                if (!$form.valid()) {
+                    return;
+                }
+
+                const originalButtonContent = $form.find('button[type="submit"]').html();
+                $form.find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processando...');
+
+                jQuery.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: $form.serialize(),
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    success: function (response) {
+                        if (response.success && response.analiseId) {
+                            // Se a análise foi gerada (caso do GerarAnalise)
+                            alert(response.message || 'Operação realizada com sucesso!');
+                            closeModal();
+                            // Redirecionar para os detalhes da análise recém-criada
+                            window.location.href = '/Analises/Details/' + response.analiseId;
+                        } else {
+                            // Se for um CREATE ou EDIT (que retornaria a partial view com o formulário atualizado ou vazio)
+                            // ou se houver um erro de validação (tratado abaixo)
+
+                            // Recarrega a página se o sucesso for genérico (após um DELETE ou CREATE/EDIT bem-sucedido)
+                            alert(response.message || 'Operação realizada com sucesso!');
+                            closeModal();
+                            window.location.reload();
+                        }
+                    },
+                    error: function (xhr) {
+                        // Se o servidor retornar uma Partial View (geralmente em caso de erro de validação no CREATE/EDIT)
+                        if (xhr.getResponseHeader('Content-Type')?.includes('text/html')) {
+                            // Substitui o conteúdo do modal pelo novo HTML (a partial view com erros)
+                            modalBody.innerHTML = xhr.responseText;
+                            // Re-bind nos listeners da nova partial view
+                            bindModalEventListeners(formId);
+                        } else {
+                            // Erro genérico
+                            alert('Erro: ' + (xhr.responseJSON?.message || xhr.responseText || 'Ocorreu um erro desconhecido.'));
+                            closeModal();
+                        }
+                    },
+                    complete: function () {
+                        // Resetar o botão de submit (se não houve sucesso e redirecionamento)
+                        $form.find('button[type="submit"]').prop('disabled', false).html(originalButtonContent);
+                    }
+                });
+            });
         }
     }
 

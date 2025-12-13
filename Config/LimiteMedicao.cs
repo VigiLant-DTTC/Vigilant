@@ -1,4 +1,3 @@
-// Models/Config/LimiteMedicao.cs
 using VigiLant.Models.Enum;
 
 namespace VigiLant.Config
@@ -16,7 +15,6 @@ namespace VigiLant.Config
     {
         public static Dictionary<TipoSensores, LimiteSensor> Regras = new Dictionary<TipoSensores, LimiteSensor>
         {
-            // Exemplo 1: Sensor de Temperatura (graus Celsius ou Fahrenheit, ajuste a unidade)
             {
                 TipoSensores.Temperatura,
                 new LimiteSensor

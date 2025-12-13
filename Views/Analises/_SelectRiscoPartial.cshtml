@@ -1,0 +1,41 @@
+@model IEnumerable<VigiLant.Models.Risco>
+
+<link rel="stylesheet" href="/css/viewrevo.css" asp-append-version="true" />
+
+<form asp-controller="Analises" asp-action="GerarAnalise" method="post" id="selectRiscoForm">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <p class="mb-3">
+        Selecione o Risco existente que você deseja submeter à Inteligência Artificial para gerar a **Análise Preventiva** e as **Soluções Sugeridas**.
+    </p>
+
+    <div class="form-group mb-3">
+        <label for="riscoId" class="form-label">
+            <i class="fas fa-exclamation-triangle"></i> Selecionar Risco:
+        </label>
+        
+        <select name="riscoId" id="riscoId" class="form-select" required>
+            <option value="">-- Selecione um Risco para Análise --</option>
+            @if (Model != null)
+            {
+                foreach (var risco in Model)
+                {
+                    <option value="@risco.Id">@risco.Nome (#@risco.Id)</option>
+                }
+            }
+        </select>
+        
+        <small class="form-text text-muted">A análise só pode ser gerada para Riscos que já foram registrados.</small>
+    </div>
+
+    <div class="form-group mt-4 text-end">
+        <button type="submit" class="btn-primary" id="btnGerarAnalise">
+            <i class="fas fa-brain"></i> Gerar Análise com IA
+        </button>
+        <button type="button" class="btn-secondary" id="cancelModalButton">
+            <i class="fas fa-arrow-left"></i> Cancelar
+        </button>
+    </div>
+</form>
+

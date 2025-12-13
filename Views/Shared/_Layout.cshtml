@@ -44,8 +44,8 @@
                             <hr class="menu-divider">
                         </li>
                         <li>
-                            <a href="@Url.Action("", "")"
-                                class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "" ? "active" : "")">
+                            <a href="@Url.Action("Index", "Analises")"
+                                class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Analises" ? "active" : "")">
                                 <i class="fas fa-microchip"></i>
                                 <span>IA Análise</span>
                             </a>

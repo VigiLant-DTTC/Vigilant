@@ -26,6 +26,22 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = E:\Tiago\Documents\VigiLant
 build_property._RazorSourceGeneratorDebug = 
 
+[E:/Tiago/Documents/VigiLant/Views/Analises/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hbGlzZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Tiago/Documents/VigiLant/Views/Analises/_DeleteAnalisePartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hbGlzZXNcX0RlbGV0ZUFuYWxpc2VQYXJ0aWFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Tiago/Documents/VigiLant/Views/Analises/_DetailsAnalisePartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hbGlzZXNcX0RldGFpbHNBbmFsaXNlUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Tiago/Documents/VigiLant/Views/Analises/_SelectRiscoPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQW5hbGlzZXNcX1NlbGVjdFJpc2NvUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/Tiago/Documents/VigiLant/Views/Colaboradores/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29sYWJvcmFkb3Jlc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

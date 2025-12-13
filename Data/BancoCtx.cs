@@ -15,7 +15,7 @@ namespace VigiLant.Data
         {
             modelBuilder.Entity<Risco>()
                 .Property(r => r.NivelGravidade)
-                .HasConversion<string>(); 
+                .HasConversion<string>();
         }
 
         public DbSet<Colaborador> Colaboradores { get; set; }
@@ -23,6 +23,8 @@ namespace VigiLant.Data
         public DbSet<Risco> Riscos { get; set; }
         public DbSet<Relatorio> Relatorios { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Analise> Analises { get; set; }
+
 
         public DbSet<AppConfig> AppConfigs { get; set; }
     }

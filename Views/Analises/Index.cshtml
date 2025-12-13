@@ -1,0 +1,103 @@
+@model IEnumerable<VigiLant.Models.Analise>
+@{
+    ViewData["Title"] = "Análises de Risco";
+    var hasAnalises = Model.Any();
+}
+
+<div class="PageFlex">
+    <div class="page-header">
+        <h1 class="page-title">Análises de Risco</h1>
+        <div class="breadcrumb">
+            <a href="@Url.Action("Index", "Home")">Dashboard</a>
+            <span class="separator">/</span>
+            <span class="active">Análises</span>
+        </div>
+    </div>
+
+    <div class="page-actions">
+        <div></div>
+        <div class="page-actions">
+            <div></div>
+            <div class="btts">
+                <button type="button" class="btn-primary" data-action-type="create-modal"
+                    data-url="@Url.Action("SelectRisco", "Analises")" data-title="Gerar Nova Análise com IA"
+                    data-form-id="selectRiscoForm">
+                    <i class="fas fa-search-plus"></i>
+                    Gerar Nova Análise
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID Análise</th>
+                <th>Risco Associado</th>
+                <th>Data da Análise</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        @if (hasAnalises)
+        {
+            <tbody>
+                @foreach (var analise in Model)
+                {
+                    <tr>
+                        <td>#@analise.Id</td>
+                        <td>@analise.Risco.Nome</td>
+                        <td>@analise.DataAnalise.ToShortDateString()</td>
+                        <td>
+                            <span class="status-badge info">
+                                @analise.StatusAnalise
+                            </span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <button type="button" class="btn-icon btn-ajax-modal" title="Ver Detalhes" data-id="@analise.Id"
+                                    data-action-type="details" data-controller-url="@Url.Content("~/Analises")"
+                                    data-title="Detalhes da Análise #{ID}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+
+                                @if (User.IsInRole("Administrador") || User.IsInRole("Gestor"))
+                                {
+                                    <button type="button" class="btn-icon btn-ajax-modal text-danger" title="Excluir"
+                                        data-id="@analise.Id" data-action-type="delete"
+                                        data-controller-url="@Url.Content("~/Analises")"
+                                        data-title="Confirmação de Exclusão da Análise #{ID}" data-form-id="deleteFormAnalise">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        }
+    </table>
+    @if (!hasAnalises)
+    {
+        <div class="empty-list-message">
+            <i class="fas fa-chart-line icon-large"></i>
+            <h3>Nenhuma Análise Encontrada</h3>
+            <p>Clique em <b>Gerar Nova Análise</b> para aplicar a Inteligência Artificial na previsão de riscos.</p>
+        </div>
+    }
+</div>
+
+<div id="ajax-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 id="modalTitle">Título</h5> <button id="closeModalButton" ...>X</button>
+        </div>
+        <div id="modalBody" class="modal-body"> </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/Partialjs.js" asp-append-version="true"></script>
+}

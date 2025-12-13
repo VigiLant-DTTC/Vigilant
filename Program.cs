@@ -34,6 +34,7 @@ builder.Services.AddScoped<IEquipamentoRepository, EquipamentoRepository>();
 builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
+builder.Services.AddScoped<IAnaliseRepository, AnaliseRepository>();
 
 // 4. Adicionar o serviço SignalR e o Hub
 builder.Services.AddSignalR();

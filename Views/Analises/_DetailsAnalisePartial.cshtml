@@ -1,0 +1,49 @@
+@model VigiLant.Models.Analise
+
+<link rel="stylesheet" href="/css/viewrevo.css" asp-append-version="true" />
+
+<div class="details-container">
+    <div class="row mb-2">
+        <dt class="col-sm-4">Risco Analisado:</dt>
+        <dd class="col-sm-8">@Model.Risco.Nome (#@Model.RiscoId)</dd>
+    </div>
+
+    <div class="row mb-2">
+        <dt class="col-sm-4">Data da Análise:</dt>
+        <dd class="col-sm-8">@Model.DataAnalise.ToShortDateString()</dd>
+    </div>
+    
+    <div class="row mb-2">
+        <dt class="col-sm-4">Status:</dt>
+        <dd class="col-sm-8">
+            <span class="status-badge info">@Model.StatusAnalise</span>
+        </dd>
+    </div>
+    
+    <hr class="divider" />
+    
+    <div class="row mt-3">
+        <div class="col-sm-12">
+            <strong class="form-label">Previsão de Riscos Futuros (IA):</strong>
+        </div>
+        <div class="col-sm-12 description-text">
+            @Model.PrevisaoRiscosFuturos
+        </div>
+    </div>
+    
+    <div class="row mt-3">
+        <div class="col-sm-12">
+            <strong class="form-label">Soluções Sugeridas (IA):</strong>
+        </div>
+        <div class="col-sm-12 description-text">
+            @Model.SolucoesSugeridas
+        </div>
+    </div>
+
+</div>
+
+<div class="form-group mt-4 text-end">
+    <button type="button" class="btn-secondary" id="cancelModalButton">
+        <i class="fas fa-arrow-left"></i> Fechar Detalhes
+    </button>
+</div>

@@ -1,0 +1,38 @@
+@model VigiLant.Models.Analise
+
+<link rel="stylesheet" href="/css/viewrevo.css" asp-append-version="true" />
+
+<div class="delete-message p-3" style="background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: .25rem;">
+    <h4 class="card-title text-danger">⚠️ Confirmação de Exclusão de Análise</h4>
+    <p class="text-danger">Você tem certeza que deseja <b>excluir permanentemente</b> esta análise?</p>
+
+    <div class="details-container">
+        <div class="row">
+            <div class="col-sm-6">ID da Análise:</div>
+            <div class="col-sm-6">#@Model.Id</div>
+        </div>
+        <hr class="divider" />
+        <div class="row">
+            <div class="col-sm-6">Risco Analisado:</div>
+            <div class="col-sm-6">@Model.Risco.Nome</div>
+        </div>
+    </div>
+
+    <div class="alert alert-warning" role="alert" style="margin-top: 15px;">
+        Esta ação é <b>irreversível</b> e removerá todos os dados desta Análise.
+    </div>
+</div>
+
+<form asp-action="Delete" method="post" id="deleteFormAnalise">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group mt-4 text-end">
+        <button type="submit" class="btn-primary" style="background-color: #d11a2a;">
+            <i class="fas fa-trash"></i> Sim, Excluir Definitivamente
+        </button>
+        <button type="button" class="btn-secondary" id="cancelModalButton">
+            <i class="fas fa-arrow-left"></i> Cancelar
+        </button>
+    </div>
+</form>
