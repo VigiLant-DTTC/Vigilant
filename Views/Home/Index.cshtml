@@ -157,12 +157,14 @@
 
 @section Scripts {
     <script src="/js/Partialjs.js" asp-append-version="true"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js"></script> // LINHA MODIFICADA
     <script>
         function getRiscosData() {
             try {
+                // A linha abaixo já trata o caso de ser null, mas precisamos garantir que é uma lista de JS
                 var data = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.RiscosMensais ?? new List<int>()));
 
+                // Preenche com zeros caso a lista do C# venha incompleta (menos de 12 meses)
                 while (data.length < 12) {
                     data.push(0);
                 }
@@ -174,49 +176,54 @@
         }
         
         var riscosMensaisData = getRiscosData();
-
         // Nomes dos meses (Labels)
         var labels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-        
         // 1. Substitui o placeholder pela tag <canvas>
         var chartPlaceholder = document.querySelector('.chart-placeholder');
         if (chartPlaceholder) {
             // Remove os divs de placeholder existentes 
             chartPlaceholder.innerHTML = '<canvas id="risksChart"></canvas>';
-        }
-
-        // 2. Inicializa o Chart.js
-        const ctx = document.getElementById('risksChart').getContext('2d');
-        const risksChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Riscos Identificados',
-                    data: riscosMensaisData, // Usa os dados do C#
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false, 
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        // Garante que o eixo Y exiba apenas números inteiros
-                        ticks: {
-                            callback: function(value) { if (value % 1 === 0) { return value; } }
+            // 2. Inicializa o Chart.js SOMENTE se o placeholder existir e for substituído
+            const ctx = document.getElementById('risksChart').getContext('2d');
+            if (ctx) { // Adiciona verificação se o contexto 2D foi obtido
+                 // Define uma altura mínima para o container do gráfico, se necessário.
+                chartPlaceholder.style.minHeight = '300px'; // Pode ser necessário ajustar no CSS.
+                const risksChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Riscos Identificados',
+                            data: riscosMensaisData, // Usa os dados do C#
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false, 
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                // Garante que o eixo Y exiba apenas números inteiros
+                                ticks: {
+                                    callback: function(value) { if (value % 1 === 0) { return value; } }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
                         }
                     }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
+                });
+            } else {
+                 console.error("Não foi possível obter o contexto 2D para o gráfico.");
             }
-        });
+        } else {
+             console.error("Elemento .chart-placeholder não encontrado.");
+        }
     </script>
 }

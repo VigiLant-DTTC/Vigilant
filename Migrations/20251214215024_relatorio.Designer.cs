@@ -12,8 +12,8 @@ using VigiLant.Data;
 namespace VigiLant.Migrations
 {
     [DbContext(typeof(BancoCtx))]
-    [Migration("20251214005959_notific")]
-    partial class notific
+    [Migration("20251214215024_relatorio")]
+    partial class relatorio
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,6 +176,10 @@ namespace VigiLant.Migrations
                     b.Property<DateTime>("DataGeracao")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("EquipamentoNome")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<int>("GeradoPorColaboradorId")
                         .HasColumnType("int");
 
@@ -228,33 +232,6 @@ namespace VigiLant.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Riscos");
-                });
-
-            modelBuilder.Entity("VigiLant.Models.Solicitacao", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DataSolicitacao")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Solicitacoes");
                 });
 
             modelBuilder.Entity("VigiLant.Models.Usuario", b =>

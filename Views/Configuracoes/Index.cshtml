@@ -19,21 +19,23 @@
 </div>
 
 <div class="mobile-settings-container">
-    
-    <a href="@Url.Action("ConfigBroker", "Configuracoes")" class="settings-item">
-        <div class="settings-content">
-            <div class="settings-icon icon-primary">
-                <i class="fas fa-satellite-dish"></i>
+    @if (User.IsInRole("Administrador") || User.IsInRole("Gestor"))
+    {
+        <a href="@Url.Action("ConfigBroker", "Configuracoes")" class="settings-item">
+            <div class="settings-content">
+                <div class="settings-icon icon-primary">
+                    <i class="fas fa-satellite-dish"></i>
+                </div>
+                <div class="settings-text">
+                    <span class="settings-title">Configurações MQTT Broker</span>
+                    <span class="settings-subtitle">Ajuste o host e o tópico para conectar ao broker.</span>
+                </div>
             </div>
-            <div class="settings-text">
-                <span class="settings-title">Configurações MQTT Broker</span>
-                <span class="settings-subtitle">Ajuste o host e o tópico para conectar ao broker.</span>
+            <div class="settings-chevron">
+                <i class="fas fa-chevron-right"></i>
             </div>
-        </div>
-        <div class="settings-chevron">
-            <i class="fas fa-chevron-right"></i>
-        </div>
-    </a>
+        </a>
+    }
 
     <a href="#" class="settings-item">
         <div class="settings-content">

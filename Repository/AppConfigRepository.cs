@@ -4,6 +4,7 @@ using VigiLant.Contratos;
 using VigiLant.Models;
 using VigiLant.Data;
 using System.Linq;
+using VigiLant.Models.Enum;
 
 namespace VigiLant.Repository
 {
@@ -18,7 +19,25 @@ namespace VigiLant.Repository
 
         public AppConfig? GetConfig()
         {
-            return _context.AppConfigs.FirstOrDefault();
+            var config = _context.AppConfigs.FirstOrDefault(); 
+
+            if (config == null) // Se não encontrou nada
+            {
+                // 1. Cria uma configuração padrão
+                config = new AppConfig
+                {
+                    Id = 1,
+                    MqttHost = "broker.emqx.io", // Exemplo: Host local
+                    MqttPort = MqttPorta.Porta1883, // Exemplo: 1883
+                    MqttTopicWildcard = "vigilant/data/#"
+                };
+
+                // 2. Salva essa configuração no banco de dados
+                _context.AppConfigs.Add(config);
+                _context.SaveChanges();
+            }
+
+            return config;
         }
 
         public void UpdateConfig(AppConfig config)
@@ -29,7 +48,7 @@ namespace VigiLant.Repository
                 existing.MqttHost = config.MqttHost;
                 existing.MqttPort = config.MqttPort;
                 existing.MqttTopicWildcard = config.MqttTopicWildcard;
-                
+
                 _context.AppConfigs.Update(existing);
             }
             else

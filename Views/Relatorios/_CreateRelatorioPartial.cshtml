@@ -7,7 +7,7 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="SuperFlex">
-        <div class="flex1"> @* Coluna 1: Nome, Tipo, Colaborador *@
+        <div class="flex1"> 
             <div class="form-group mb-3">
                 <label asp-for="Nome" class="form-label">Nome do Relatório</label>
                 <input asp-for="Nome" class="form-control" />
@@ -16,30 +16,24 @@
             
             <div class="form-group mb-3">
                 <label asp-for="TipoRelatorio" class="form-label">Tipo de Relatório</label>
-                @* Assumindo que o tipo é uma string de texto livre. Para um Enum/Lista, usar <select> *@
                 <input asp-for="TipoRelatorio" class="form-control" />
                 <span asp-validation-for="TipoRelatorio" class="text-danger"></span>
             </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="GeradoPorColaboradorId" class="form-label">Gerado por (ID do Colaborador)</label>
-                @* Para um ID de usuário, pode ser um input number ou select de colaboradores *@
-                <input asp-for="GeradoPorColaboradorId" type="number" class="form-control" />
-                <span asp-validation-for="GeradoPorColaboradorId" class="text-danger"></span>
+           <div class="form-group mb-3">
+                <label asp-for="EquipamentoNome" class="form-label">Equipamento Relacionado</label>
+                <select asp-for="EquipamentoNome" class="form-control" asp-items="ViewBag.EquipamentosLista">
+                    <option value="">-- Selecione um Equipamento --</option>
+                </select>
+                <span asp-validation-for="EquipamentoNome" class="text-danger"></span>
             </div>
         </div>
         
-        <div class="flex1"> @* Coluna 2: Conteúdo, Data *@
+        <div class="flex1"> 
             <div class="form-group mb-3">
                 <label asp-for="Conteudo" class="form-label">Conteúdo/Resumo do Relatório</label>
                 <textarea asp-for="Conteudo" class="form-control" rows="5"></textarea>
                 <span asp-validation-for="Conteudo" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="DataGeracao" class="form-label">Data de Geração</label>
-                <input asp-for="DataGeracao" type="date" class="form-control" />
-                <span asp-validation-for="DataGeracao" class="text-danger"></span>
             </div>
         </div>
     </div>

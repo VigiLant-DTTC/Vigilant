@@ -40,9 +40,6 @@ namespace VigiLant.Controllers
         {
             var novoColaborador = new Colaborador { DataAdmissao = DateTime.Today };
 
-            var nomePreenchimento = TempData["NomeSolicitacao"] as string;
-            var emailPreenchimento = TempData["EmailSolicitacao"] as string;
-
             if (IsAjaxRequest())
             {
                 return PartialView("_CreateColaboradorPartial", novoColaborador);
@@ -57,11 +54,11 @@ namespace VigiLant.Controllers
         {
             if (ModelState.IsValid)
             {
+                colaborador.StatusAcesso = StatusVinculacao.Pendente;
                 _colaboradorRepository.Add(colaborador);
 
                 if (IsAjaxRequest())
                 {
-                    // Retorna Ok com o TempData para ser exibido após o reload
                     if (TempData["Sucesso"] != null)
                     {
                         return Ok(new { success = true, message = TempData["Sucesso"] });

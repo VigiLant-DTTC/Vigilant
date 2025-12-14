@@ -152,7 +152,7 @@ public class ContaController : Controller
                 StatusAcesso = StatusVinculacao.aConfirmar,
                 UsuarioId = novoUsuario.Id,
                 Cargo = Cargo.Colaborador,
-                Departamento = "Pendente"
+                Departamento = "SEM DEPARTAMENTO"
             };
             _colaboradorRepository.Add(novoColaborador);
 

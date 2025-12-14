@@ -173,6 +173,10 @@ namespace VigiLant.Migrations
                     b.Property<DateTime>("DataGeracao")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("EquipamentoNome")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<int>("GeradoPorColaboradorId")
                         .HasColumnType("int");
 

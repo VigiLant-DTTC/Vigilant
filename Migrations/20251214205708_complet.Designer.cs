@@ -12,8 +12,8 @@ using VigiLant.Data;
 namespace VigiLant.Migrations
 {
     [DbContext(typeof(BancoCtx))]
-    [Migration("20251212052002_new")]
-    partial class @new
+    [Migration("20251214205708_complet")]
+    partial class complet
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,39 @@ namespace VigiLant.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("VigiLant.Models.Analise", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DataAnalise")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PrevisaoRiscosFuturos")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("RiscoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SolucoesSugeridas")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("StatusAnalise")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RiscoId");
+
+                    b.ToTable("Analises");
+                });
 
             modelBuilder.Entity("VigiLant.Models.AppConfig", b =>
                 {
@@ -143,6 +176,9 @@ namespace VigiLant.Migrations
                     b.Property<DateTime>("DataGeracao")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int>("EquipamentoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("GeradoPorColaboradorId")
                         .HasColumnType("int");
 
@@ -155,6 +191,8 @@ namespace VigiLant.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EquipamentoId");
 
                     b.ToTable("Relatorios");
                 });
@@ -186,9 +224,8 @@ namespace VigiLant.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("TipoRisco")
                         .HasColumnType("int");
@@ -224,6 +261,28 @@ namespace VigiLant.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("VigiLant.Models.Analise", b =>
+                {
+                    b.HasOne("VigiLant.Models.Risco", "Risco")
+                        .WithMany()
+                        .HasForeignKey("RiscoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Risco");
+                });
+
+            modelBuilder.Entity("VigiLant.Models.Relatorio", b =>
+                {
+                    b.HasOne("VigiLant.Models.Equipamento", "Equipamento")
+                        .WithMany()
+                        .HasForeignKey("EquipamentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Equipamento");
                 });
 #pragma warning restore 612, 618
         }

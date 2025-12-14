@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VigiLant.Migrations
 {
     /// <inheritdoc />
-    public partial class totally : Migration
+    public partial class complet : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -83,27 +83,6 @@ namespace VigiLant.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Relatorios",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Nome = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DataGeracao = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Conteudo = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TipoRelatorio = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    GeradoPorColaboradorId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Relatorios", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Riscos",
                 columns: table => new
                 {
@@ -118,8 +97,7 @@ namespace VigiLant.Migrations
                     TipoRisco = table.Column<int>(type: "int", nullable: false),
                     NivelGravidade = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Status = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     DataIdentificacao = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
@@ -147,11 +125,79 @@ namespace VigiLant.Migrations
                     table.PrimaryKey("PK_Usuarios", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Relatorios",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Nome = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DataGeracao = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Conteudo = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TipoRelatorio = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EquipamentoId = table.Column<int>(type: "int", nullable: false),
+                    GeradoPorColaboradorId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Relatorios", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Relatorios_Equipamentos_EquipamentoId",
+                        column: x => x.EquipamentoId,
+                        principalTable: "Equipamentos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Analises",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    RiscoId = table.Column<int>(type: "int", nullable: false),
+                    DataAnalise = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    PrevisaoRiscosFuturos = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SolucoesSugeridas = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StatusAnalise = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Analises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Analises_Riscos_RiscoId",
+                        column: x => x.RiscoId,
+                        principalTable: "Riscos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Analises_RiscoId",
+                table: "Analises",
+                column: "RiscoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Relatorios_EquipamentoId",
+                table: "Relatorios",
+                column: "EquipamentoId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Analises");
+
             migrationBuilder.DropTable(
                 name: "AppConfigs");
 
@@ -159,16 +205,16 @@ namespace VigiLant.Migrations
                 name: "Colaboradores");
 
             migrationBuilder.DropTable(
-                name: "Equipamentos");
+                name: "Relatorios");
 
             migrationBuilder.DropTable(
-                name: "Relatorios");
+                name: "Usuarios");
 
             migrationBuilder.DropTable(
                 name: "Riscos");
 
             migrationBuilder.DropTable(
-                name: "Usuarios");
+                name: "Equipamentos");
         }
     }
 }
