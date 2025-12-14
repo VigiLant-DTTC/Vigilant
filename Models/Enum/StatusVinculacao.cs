@@ -5,5 +5,6 @@ namespace VigiLant.Models.Enum
         Pendente = 1,
         aConfirmar = 2,
         Ativo = 3,
+        Recusado = 4
     }
 }

@@ -1,3 +1,4 @@
+@using VigiLant.Models.Enum
 @model VigiLant.Models.ViewModel.NotificacoesViewModel
 
 @{
@@ -33,7 +34,7 @@
 
 <div class="notificacoes-list-container">
 
-    @if (!Model.SolicitacoesPendentes.Any() && !Model.NovosRiscos.Any() && !Model.AnalisesGeradas.Any())
+    @if (!Model.ColaboradoresPendentes.Any() && !Model.NovosRiscos.Any() && !Model.AnalisesGeradas.Any())
     {
         <div class="empty-list-message text-center p-5">
             <i class="far fa-bell icon-large" style="font-size: 3rem; color: #ccc;"></i>
@@ -44,25 +45,35 @@
     else
     {
         // 1. SOLICITAÇÕES PENDENTES (Ex: Colaborador precisa de aprovação)
-        @foreach (var solicitacao in Model.SolicitacoesPendentes)
+        @foreach (var colaboradorPendente in Model.ColaboradoresPendentes)
         {
+            // O modelo deve ser Colaborador, não Solicitacao
             <div class="notification-card solicitacao">
                 <div class="notification-title">
-                    <i class="fas fa-user-plus notification-icon"></i> SOLICITAÇÃO PENDENTE
+                    <i class="fas fa-user-plus notification-icon"></i> CONFIRMAÇÃO DE ACESSO PENDENTE
                 </div>
                 <div class="notification-message">
-                    O colaborador <b>@solicitacao.Nome</b> aguarda sua aprovação para vincular a conta.
+                    O usuário <b>@colaboradorPendente.Nome</b> com o e-mail <b>@colaboradorPendente.Email</b> aguarda sua
+                    aprovação para vincular a conta.
                 </div>
                 <div class="notification-footer">
-                    <span class="notification-timestamp">Aguardando desde
-                        @solicitacao.DataSolicitacao.ToString("dd/MM/yyyy")</span>
+                    <span class="notification-timestamp">Solicitado em:
+                        @colaboradorPendente.DataAdmissao.ToString("dd/MM/yyyy")</span>
 
-                    <button type="button" class="btn-icon btn-ajax-modal" title="Aceitar e Criar Colaborador"
-                        data-id="@solicitacao.Id" data-form-id="colaboradorForm" data-action-type="create-from-solicitacao"
-                        data-controller-url="@Url.Content("~/Colaboradores")" data-title="Criar Colaborador com Solicitação">
-                        <i class="fas fa-check"></i> Aceitar e Analisar
-                    </button>
+                    <div> 
+                        <button type="button" class="btn-icon btn-confirmar-acesso btn-success" title="Aceitar Acesso"
+                            data-id="@colaboradorPendente.Id" data-novo-status="@((int)StatusVinculacao.Ativo)"
+                            data-controller-url="@Url.Content("~/Colaboradores/ConfirmarAcesso")">
+                            <i class="fas fa-check"></i> Aceitar
+                        </button>
 
+                        @* Botão para RECUSAR: Chama a Action ConfirmarAcesso com StatusVinculacao.Recusado (4) *@
+                        <button type="button" class="btn-icon btn-confirmar-acesso btn-danger" title="Recusar Acesso"
+                            data-id="@colaboradorPendente.Id" data-novo-status="@((int)StatusVinculacao.Recusado)"
+                            data-controller-url="@Url.Content("~/Colaboradores/ConfirmarAcesso")">
+                            <i class="fas fa-times"></i> Recusar
+                        </button>
+                    </div>
                 </div>
             </div>
         }
@@ -130,6 +141,10 @@
 </div>
 
 @section Scripts {
-    <script src="/js/Partialjs.js" asp-append-version="true"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script> 
+    
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    
+    <script src="~/js/Partialjs.js" asp-append-version="true"></script>
 }

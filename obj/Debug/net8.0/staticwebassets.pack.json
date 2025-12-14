@@ -5,6 +5,14 @@
       "PackagePath": "staticwebassets\\VigiLant.bundle.scp.css"
     },
     {
+      "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\FaviconVIGILANT.png",
+      "PackagePath": "staticwebassets\\FaviconVIGILANT.png"
+    },
+    {
+      "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\VIGILANTLOGON.png",
+      "PackagePath": "staticwebassets\\VIGILANTLOGON.png"
+    },
+    {
       "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\Conta.css",
       "PackagePath": "staticwebassets\\css\\Conta.css"
     },
@@ -39,10 +47,6 @@
     {
       "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\viewrevo.css",
       "PackagePath": "staticwebassets\\css\\viewrevo.css"
-    },
-    {
-      "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\favicon.png",
-      "PackagePath": "staticwebassets\\favicon.png"
     },
     {
       "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\js\\Partialjs.js",

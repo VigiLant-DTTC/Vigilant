@@ -40,7 +40,6 @@ namespace VigiLant.Repository
             }
         }
 
-
         public async Task Delete(int usuarioId)
         {
             var usuario = await _context.Usuarios.FindAsync(usuarioId);

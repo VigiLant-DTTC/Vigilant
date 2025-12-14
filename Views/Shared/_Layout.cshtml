@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] | VigiLant</title>
-    <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/FaviconVIGILANT.png" type="image/x-icon">
 
     @if (ViewData["ExcludeSharedCss"] == null)
     {
@@ -27,7 +27,8 @@
         {
             <aside class="sidebar">
                 <a asp-controller="Home" asp-action="Index" class="logo">
-                    <i class="bx bx-shield-alt"></i>
+                    <img src="/VIGILANTLOGON.png" alt="VigiLant Logo Shield"
+                        style="height: 40px; width: auto; margin-right: 5px;">
                     <div class="logo-name"><span>Vigi</span>Lant</div>
                 </a>
 
@@ -88,14 +89,14 @@
                                     <span>Relatórios</span>
                                 </a>
                             </li>
-                            }
-                            <li>
-                                <a href="@Url.Action("Index", "Notificacoes")"
-                                    class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Notificacoes" ? "active" : "")">
-                                    <i class="bx bx-bell menu-icon"></i>
-                                    <span>Alertas</span>
-                                </a>
-                            </li>
+                        }
+                        <li>
+                            <a href="@Url.Action("Index", "Notificacoes")"
+                                class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Notificacoes" ? "active" : "")">
+                                <i class="bx bx-bell menu-icon"></i>
+                                <span>Alertas</span>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
 

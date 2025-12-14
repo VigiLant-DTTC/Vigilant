@@ -14,14 +14,12 @@ public class ContaController : Controller
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IHashService _hashService;
     private readonly IColaboradorRepository _colaboradorRepository;
-    private readonly ISolicitacaoRepository _solicitacaoRepository;
 
-    public ContaController(IUsuarioRepository usuarioRepository, IHashService hashService, IColaboradorRepository colaboradorRepository, ISolicitacaoRepository solicitacaoRepository)
+    public ContaController(IUsuarioRepository usuarioRepository, IHashService hashService, IColaboradorRepository colaboradorRepository)
     {
         _usuarioRepository = usuarioRepository;
         _hashService = hashService;
         _colaboradorRepository = colaboradorRepository;
-        _solicitacaoRepository = solicitacaoRepository;
     }
 
     private IActionResult RedirecionarParaHome() => RedirectToAction("Index", "Home");
@@ -57,6 +55,27 @@ public class ContaController : Controller
         if (usuario == null || !_hashService.VerificarHash(senha, usuario.SenhaHash))
         {
             ViewBag.Erro = "E-mail ou Senha inválidos.";
+            return View();
+        }
+
+        // 2.1. NOVO PASSO: Verificar Status de Acesso do Colaborador
+        var colaboradorVinculado = await _colaboradorRepository.GetByEmail(usuario.Email);
+
+        if (colaboradorVinculado != null && colaboradorVinculado.StatusAcesso != StatusVinculacao.Ativo)
+        {
+            if (colaboradorVinculado.StatusAcesso == StatusVinculacao.aConfirmar)
+            {
+                ViewBag.Erro = "Seu acesso está **pendente de confirmação** por um administrador.";
+            }
+            else if (colaboradorVinculado.StatusAcesso == StatusVinculacao.Recusado)
+            {
+                ViewBag.Erro = "Seu acesso foi **recusado**. Por favor, entre em contato com o administrador.";
+            }
+            // Se for Pendente (Fluxo antigo, mas não deve acontecer mais) ou aConfirmar
+            else
+            {
+                ViewBag.Erro = "Seu acesso está pendente de confirmação. Contate o administrador.";
+            }
             return View();
         }
 
@@ -114,17 +133,31 @@ public class ContaController : Controller
 
         if (colaborador == null)
         {
-            var novaSolicitacao = new Solicitacao
+            var novoUsuario = new Usuario
             {
                 Nome = nome,
                 Email = email,
-                DataSolicitacao = DateTime.Now,
-                Status = StatusSolicitacao.Pendente
+                SenhaHash = _hashService.GerarHash(senha),
+                cargo = Cargo.Colaborador
             };
 
-            await _solicitacaoRepository.Adicionar(novaSolicitacao);
+            await _usuarioRepository.Adicionar(novoUsuario);
 
-            ViewBag.Erro = "Seu e-mail não consta em nossa base. Sua solicitação de participação foi enviada e será revisada por um administrador.";
+            // b. Criar novo Colaborador vinculado
+            var novoColaborador = new Colaborador
+            {
+                Nome = nome,
+                Email = email,
+                DataAdmissao = DateTime.Today,
+                StatusAcesso = StatusVinculacao.aConfirmar,
+                UsuarioId = novoUsuario.Id,
+                Cargo = Cargo.Colaborador,
+                Departamento = "Pendente"
+            };
+            _colaboradorRepository.Add(novoColaborador);
+
+            // c. Informar ao usuário que a conta precisa de confirmação
+            ViewBag.Erro = "Seu registro foi concluído. Sua conta está **pendente de aprovação** por um administrador. Você será notificado após a confirmação.";
 
             return View();
         }
@@ -132,8 +165,6 @@ public class ContaController : Controller
         // 3. Verificar se o colaborador já está vinculado a uma conta de usuário
         if (colaborador.UsuarioId.HasValue)
         {
-            // Esta verificação já é coberta pela busca no _usuarioRepository,
-            // mas é um ponto de segurança: se ele tem UsuarioId, a conta já existe
             ViewBag.Erro = "O colaborador com este e-mail já está vinculado Por favor, use a tela de login.";
             return View();
         }
@@ -141,7 +172,7 @@ public class ContaController : Controller
         // CASO 2: Colaborador ENCONTRADO e NÃO VINCULADO
 
         // 4. Criar novo usuário do sistema
-        var novoUsuario = new Usuario
+        var novowUsuario = new Usuario
         {
             Nome = nome,
             Email = email,
@@ -150,10 +181,10 @@ public class ContaController : Controller
         };
 
         // 5. Salvar o novo Usuário no DB
-        await _usuarioRepository.Adicionar(novoUsuario);
+        await _usuarioRepository.Adicionar(novowUsuario);
 
         // 6. VINCULAR: Atualizar o registro do Colaborador com o novo UsuarioId e Status
-        colaborador.UsuarioId = novoUsuario.Id;
+        colaborador.UsuarioId = novowUsuario.Id;
         colaborador.StatusAcesso = StatusVinculacao.Ativo;
         _colaboradorRepository.UpdateStatusVinculacao(colaborador);
 

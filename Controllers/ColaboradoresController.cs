@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using System.Threading.Tasks;
+using VigiLant.Models.Enum; // Adicionado para Task<IActionResult>
 
 namespace VigiLant.Controllers
 {
@@ -13,16 +15,14 @@ namespace VigiLant.Controllers
     {
         private readonly IColaboradorRepository _colaboradorRepository;
         private readonly IUsuarioRepository _usuarioRepository;
-        private readonly ISolicitacaoRepository _solicitacaoRepository;
 
-        public ColaboradoresController(IColaboradorRepository colaboradorRepository, IUsuarioRepository usuarioRepository, ISolicitacaoRepository solicitacaoRepository)
+        public ColaboradoresController(IColaboradorRepository colaboradorRepository, IUsuarioRepository usuarioRepository)
         {
             _colaboradorRepository = colaboradorRepository;
             _usuarioRepository = usuarioRepository;
-            _solicitacaoRepository = solicitacaoRepository;
         }
 
-        // Helper para verificar se a requisição é AJAX
+
         private bool IsAjaxRequest()
         {
             return Request.Headers["X-Requested-With"] == "XMLHttpRequest";
@@ -42,21 +42,6 @@ namespace VigiLant.Controllers
 
             var nomePreenchimento = TempData["NomeSolicitacao"] as string;
             var emailPreenchimento = TempData["EmailSolicitacao"] as string;
-
-            if (solicitacaoId.HasValue)
-            {
-                var solicitacao = _solicitacaoRepository.GetById(solicitacaoId.Value);
-
-                if (solicitacao != null && solicitacao.Status == VigiLant.Models.Enum.StatusSolicitacao.Pendente)
-                {
-                    // 2. Preenche o modelo Colaborador
-                    novoColaborador.Email = solicitacao.Email;
-                    novoColaborador.Nome = solicitacao.Nome;
-
-                    // 3. Passa o ID da Solicitação para a View para o POST
-                    ViewData["SolicitacaoId"] = solicitacao.Id;
-                }
-            }
 
             if (IsAjaxRequest())
             {
@@ -136,7 +121,7 @@ namespace VigiLant.Controllers
             if (ModelState.IsValid)
             {
                 // 1. Atualiza o Colaborador (Cargo, Nome, etc.)
-                _colaboradorRepository.Update(colaborador); // [cite: 5]
+                _colaboradorRepository.Update(colaborador); // 
 
                 bool cargoAtualizadoParaUsuarioLogado = false;
 
@@ -144,7 +129,7 @@ namespace VigiLant.Controllers
                 if (colaborador.UsuarioId.HasValue)
                 {
                     // Chama o método assíncrono para atualizar o cargo do usuário
-                    await _usuarioRepository.UpdateCargo(colaborador.UsuarioId.Value, colaborador.Cargo); // [cite: 5]
+                    await _usuarioRepository.UpdateCargo(colaborador.UsuarioId.Value, colaborador.Cargo); // 
 
                     // 3. Verifica se o usuário logado é o colaborador que teve o cargo alterado
                     var currentUserIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
@@ -167,7 +152,7 @@ namespace VigiLant.Controllers
                     return RedirectToAction("Login", "Conta");
                 }
 
-                return RedirectToAction(nameof(Index)); // [cite: 5]
+                return RedirectToAction(nameof(Index)); // 
             }
 
             if (IsAjaxRequest())
@@ -176,6 +161,58 @@ namespace VigiLant.Controllers
                 return PartialView("_EditColaboradorPartial", colaborador); // Retorna a Partial com erros
             }
             return View(colaborador);
+        }
+        
+        // POST: /Colaboradores/ConfirmarAcesso
+        [HttpPost]
+        // O ideal é adicionar autorização por Role: [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> ConfirmarAcesso(int id, StatusVinculacao novoStatus)
+        {
+            var colaborador = _colaboradorRepository.GetById(id);
+
+            if (colaborador == null || colaborador.StatusAcesso != StatusVinculacao.aConfirmar)
+            {
+                if (IsAjaxRequest()) { return NotFound(); }
+                return NotFound();
+            }
+
+            if (novoStatus == StatusVinculacao.Ativo)
+            {
+                // 1. CONFIRMAR: Atualiza o status do Colaborador
+                colaborador.StatusAcesso = StatusVinculacao.Ativo;
+                _colaboradorRepository.UpdateStatusVinculacao(colaborador);
+
+                // 2. Tenta atualizar o Cargo no Usuário (se houver) - O Cargo foi definido como padrão no Register.
+                if (colaborador.UsuarioId.HasValue)
+                {
+                    await _usuarioRepository.UpdateCargo(colaborador.UsuarioId.Value, colaborador.Cargo);
+                }
+
+                TempData["Sucesso"] = $"Acesso de {colaborador.Nome} confirmado com sucesso!";
+            }
+            else if (novoStatus == StatusVinculacao.Recusado)
+            {
+                // 1. RECUSAR: Atualiza o status do Colaborador para Recusado
+                colaborador.StatusAcesso = StatusVinculacao.Recusado;
+                _colaboradorRepository.UpdateStatusVinculacao(colaborador);
+
+                // 2. Exclui o Usuário vinculado para liberar o e-mail e impedir login
+                if (colaborador.UsuarioId.HasValue)
+                {
+                    await _usuarioRepository.Delete(colaborador.UsuarioId.Value);
+                    colaborador.UsuarioId = null; 
+                    _colaboradorRepository.UpdateStatusVinculacao(colaborador);
+                }
+
+                TempData["Sucesso"] = $"Acesso de {colaborador.Nome} recusado com sucesso! Usuário removido.";
+            }
+
+            if (IsAjaxRequest())
+            {
+                return Ok(new { success = true, message = TempData["Sucesso"] });
+            }
+
+            return RedirectToAction("Index", "Notificacoes");
         }
 
         // GET: /Colaboradores/DeleteConfirmation/5 -> Retorna a Partial

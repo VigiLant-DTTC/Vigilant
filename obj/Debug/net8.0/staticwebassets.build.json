@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "BGTyoIT+ekUjo9YyD0VVvxjIkb8nmdBQuCu8g7tlxzY=",
+  "Hash": "HhJ8vQy/FcEJzeBI+dYRvYC8ObLuWG062ov4rPsW3l8=",
   "Source": "VigiLant",
   "BasePath": "_content/VigiLant",
   "Mode": "Default",
@@ -226,12 +226,12 @@
       "OriginalItemSpec": "wwwroot\\css\\viewrevo.css"
     },
     {
-      "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\favicon.png",
+      "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\FaviconVIGILANT.png",
       "SourceId": "VigiLant",
       "SourceType": "Discovered",
       "ContentRoot": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\",
       "BasePath": "_content/VigiLant",
-      "RelativePath": "favicon.png",
+      "RelativePath": "FaviconVIGILANT.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -242,7 +242,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\favicon.png"
+      "OriginalItemSpec": "wwwroot\\FaviconVIGILANT.png"
     },
     {
       "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\js\\Partialjs.js",
@@ -1440,6 +1440,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\VIGILANTLOGON.png",
+      "SourceId": "VigiLant",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\",
+      "BasePath": "_content/VigiLant",
+      "RelativePath": "VIGILANTLOGON.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\VIGILANTLOGON.png"
     }
   ]
 }

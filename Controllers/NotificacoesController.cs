@@ -12,19 +12,16 @@ namespace VigiLant.Controllers
     [Authorize]
     public class NotificacoesController : Controller
     {
-        private readonly ISolicitacaoRepository _solicitacaoRepository;
         private readonly IRiscoRepository _riscoRepository;
         private readonly IAnaliseRepository _analiseRepository;
         private readonly IColaboradorRepository _colaboradorRepository;
 
         // Injeção de dependência dos repositórios
         public NotificacoesController(
-            ISolicitacaoRepository solicitacaoRepository,
             IRiscoRepository riscoRepository,
             IAnaliseRepository analiseRepository,
             IColaboradorRepository colaboradorRepository)
         {
-            _solicitacaoRepository = solicitacaoRepository;
             _riscoRepository = riscoRepository;
             _analiseRepository = analiseRepository;
             _colaboradorRepository = colaboradorRepository;
@@ -40,11 +37,20 @@ namespace VigiLant.Controllers
         {
             var viewModel = new NotificacoesViewModel();
 
-            // 1. Notificações de Solicitação de Acesso (Visível APENAS para Administradores)
+            // 1. Notificações de SOLICITAÇÕES (CONFIRMAÇÃO DE ACESSO e Fluxo Antigo)
             if (User.HasClaim(ClaimTypes.Role, Cargo.Administrador.ToString()))
             {
-                viewModel.SolicitacoesPendentes = _solicitacaoRepository.GetAllPendentes().ToList();
+                // NOVO: Busca colaboradores que se registraram e aguardam confirmação
+                viewModel.ColaboradoresPendentes = _colaboradorRepository.GetAll()
+                    .Where(c => c.StatusAcesso == StatusVinculacao.aConfirmar)
+                    .ToList();
             }
+            else
+            {
+                // Inicializa as listas do Admin para não dar erro na View
+                viewModel.ColaboradoresPendentes = new List<Colaborador>();
+            }
+
 
             // 2. Notificações de Riscos (Status Pendente)
             viewModel.NovosRiscos = _riscoRepository.GetAll().Where(r => r.Status == StatusRisco.Pendente).ToList();
@@ -57,49 +63,9 @@ namespace VigiLant.Controllers
             ViewData["Title"] = "Notificações";
             return View(viewModel);
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrador")]
-        public IActionResult AceitarSolicitacao(int id)
-        {
-            var solicitacao = _solicitacaoRepository.GetById(id);
-
-            if (solicitacao == null || solicitacao.Status != StatusSolicitacao.Pendente)
-            {
-                TempData["Erro"] = "Solicitação não encontrada ou não está pendente.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            _solicitacaoRepository.UpdateStatus(id, StatusSolicitacao.Aceita);
-
-            TempData["NomeSolicitacao"] = solicitacao.Nome;
-            TempData["EmailSolicitacao"] = solicitacao.Email;
-            TempData["SolicitacaoId"] = solicitacao.Id;
-            
-            return RedirectToAction("Create", "Colaboradores");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrador")]
-        public IActionResult RecusarSolicitacao(int id)
-        {
-            var solicitacao = _solicitacaoRepository.GetById(id);
-            if (solicitacao == null || solicitacao.Status != StatusSolicitacao.Pendente)
-            {
-                TempData["Erro"] = "Solicitação não encontrada ou não está pendente.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            _solicitacaoRepository.UpdateStatus(id, StatusSolicitacao.Recusada);
-
-            TempData["Sucesso"] = $"Solicitação de {solicitacao.Nome} recusada.";
-            return RedirectToAction(nameof(Index));
-        }
-
+        
         // POST: /Notificacoes/MarcarRiscoComoVisualizado/5
-        [HttpPost]
+       [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult MarcarRiscoComoVisualizado(int id)
         {

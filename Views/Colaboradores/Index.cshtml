@@ -62,9 +62,17 @@
                             {
                                 <span class="badge badge-success">Ativo</span>
                             }
-                            else
+                            @if (colaborador.StatusAcesso == VigiLant.Models.Enum.StatusVinculacao.aConfirmar)
                             {
-                                <span class="badge badge-warning">Pendente</span>
+                                <span class="badge badge-success">A Confirmar</span>
+                            }
+                            @if (colaborador.StatusAcesso == VigiLant.Models.Enum.StatusVinculacao.Recusado)
+                            {
+                                <span class="badge badge-success">Recusado</span>
+                            }
+                             @if (colaborador.StatusAcesso == VigiLant.Models.Enum.StatusVinculacao.Pendente)
+                            {
+                                <span class="badge badge-success">Pendente</span>
                             }
                         </td>
                         <td>
