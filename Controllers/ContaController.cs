@@ -14,12 +14,14 @@ public class ContaController : Controller
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IHashService _hashService;
     private readonly IColaboradorRepository _colaboradorRepository;
+    private readonly ISolicitacaoRepository _solicitacaoRepository;
 
-    public ContaController(IUsuarioRepository usuarioRepository, IHashService hashService, IColaboradorRepository colaboradorRepository)
+    public ContaController(IUsuarioRepository usuarioRepository, IHashService hashService, IColaboradorRepository colaboradorRepository, ISolicitacaoRepository solicitacaoRepository)
     {
         _usuarioRepository = usuarioRepository;
         _hashService = hashService;
         _colaboradorRepository = colaboradorRepository;
+        _solicitacaoRepository = solicitacaoRepository;
     }
 
     private IActionResult RedirecionarParaHome() => RedirectToAction("Index", "Home");
@@ -112,10 +114,18 @@ public class ContaController : Controller
 
         if (colaborador == null)
         {
-            // CASO 1: Colaborador NÃO existe na base da empresa
-            // O sistema deve bloquear o registro e informar a necessidade de solicitação
-            ViewBag.Erro = "Seu e-mail não consta. Uma solicitação de participação será enviada.";
-            // Aqui você pode adicionar lógica para realmente enviar a solicitação, se necessário.
+            var novaSolicitacao = new Solicitacao
+            {
+                Nome = nome,
+                Email = email,
+                DataSolicitacao = DateTime.Now,
+                Status = StatusSolicitacao.Pendente
+            };
+
+            await _solicitacaoRepository.Adicionar(novaSolicitacao);
+
+            ViewBag.Erro = "Seu e-mail não consta em nossa base. Sua solicitação de participação foi enviada e será revisada por um administrador.";
+
             return View();
         }
 

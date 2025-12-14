@@ -25,6 +25,10 @@
       "PackagePath": "staticwebassets\\css\\iaanalysis.css"
     },
     {
+      "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\notificacoes.css",
+      "PackagePath": "staticwebassets\\css\\notificacoes.css"
+    },
+    {
       "Id": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },

@@ -35,6 +35,7 @@ builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
 builder.Services.AddScoped<IAnaliseRepository, AnaliseRepository>();
+builder.Services.AddScoped<ISolicitacaoRepository, SolicitacaoRepository>();
 builder.Services.AddScoped<IIAService, IAService>();
 
 

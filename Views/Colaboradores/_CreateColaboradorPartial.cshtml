@@ -7,6 +7,11 @@
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+    @if (ViewData["SolicitacaoId"] != null)
+    {
+        <input type="hidden" name="SolicitacaoId" value="@ViewData["SolicitacaoId"]" />
+    }
+
     <div class="SuperFlex"> 
         <div class="flex1">
             <div class="form-group mb-3">

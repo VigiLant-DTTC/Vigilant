@@ -1,0 +1,72 @@
+/* Estilo do Card de Notificação - O coração do visual */
+.notification-card {
+    background-color: #ffffff; /* Fundo branco para se destacar */
+    border-radius: 14px; /* Cantos bem arredondados (estilo iOS) */
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    cursor: default;
+}
+
+.notification-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Título/Categoria da Notificação (ex: Solicitação, Risco, Análise) */
+.notification-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #888888; /* Cor cinza sutil */
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+}
+
+/* Título da Notificação (O corpo da mensagem) */
+.notification-message {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333333; /* Cor principal do texto */
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+/* Data/Detalhe secundário (timestamp, link) */
+.notification-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eeeeee; /* Separador sutil */
+}
+
+.notification-timestamp {
+    font-size: 0.8rem;
+    color: #aaaaaa; /* Cinza mais claro para data */
+}
+
+/* Estilo dos ícones (para diferencicar tipos se necessário) */
+.notification-icon {
+    margin-right: 8px;
+    font-size: 1rem;
+}
+
+/* Cores por tipo (Opcional, mas útil para diferenciar) */
+.notification-card.solicitacao .notification-title {
+    color: #ff9500; /* Laranja (Aprovação/Ação) */
+}
+.notification-card.risco .notification-title {
+    color: #ff0d00; /* Vermelho (Urgente/Perigo) */
+}
+.notification-card.analise .notification-title {
+    color: rgb(255, 57, 22); /* Azul (Informativo) */
+}
+
+/* Oculta os estilos antigos do accordion */
+.accordion { display: none; }

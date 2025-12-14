@@ -1,0 +1,138 @@
+@model VigiLant.Models.ViewModel.NotificacoesViewModel
+
+@{
+    ViewData["Title"] = "Notificações";
+}
+
+<link rel="stylesheet" href="/css/notificacoes.css" asp-append-version="true" />
+
+<div class="page-header">
+    <h1 class="page-title">Notificações</h1>
+    <div class="breadcrumb">
+        <a href="@Url.Action("Index", "Home")">Dashboard</a>
+        <span class="separator">/</span>
+        <span class="active">Notificações</span>
+    </div>
+</div>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Sucesso"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Erro"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="notificacoes-list-container">
+
+    @if (!Model.SolicitacoesPendentes.Any() && !Model.NovosRiscos.Any() && !Model.AnalisesGeradas.Any())
+    {
+        <div class="empty-list-message text-center p-5">
+            <i class="far fa-bell icon-large" style="font-size: 3rem; color: #ccc;"></i>
+            <h3>Tudo Certo!</h3>
+            <p class="text-muted">Você não tem novas notificações no momento.</p>
+        </div>
+    }
+    else
+    {
+        // 1. SOLICITAÇÕES PENDENTES (Ex: Colaborador precisa de aprovação)
+        @foreach (var solicitacao in Model.SolicitacoesPendentes)
+        {
+            <div class="notification-card solicitacao">
+                <div class="notification-title">
+                    <i class="fas fa-user-plus notification-icon"></i> SOLICITAÇÃO PENDENTE
+                </div>
+                <div class="notification-message">
+                    O colaborador <b>@solicitacao.Nome</b> aguarda sua aprovação para vincular a conta.
+                </div>
+                <div class="notification-footer">
+                    <span class="notification-timestamp">Aguardando desde
+                        @solicitacao.DataSolicitacao.ToString("dd/MM/yyyy")</span>
+
+                    <button type="button" class="btn-icon btn-ajax-modal" 
+                        title="Aceitar e Criar Colaborador" 
+                        data-id="@solicitacao.Id"
+                        data-form-id="colaboradorForm" 
+                        data-action-type="create-from-solicitacao" 
+                        data-controller-url="@Url.Content("~/Colaboradores")" 
+                        data-title="Criar Colaborador com Solicitação">
+                         <i class="fas fa-check"></i> Aceitar e Analisar
+                    </button>
+
+                </div>
+            </div>
+        }
+
+        // 2. RISCOS GERADOS
+        @foreach (var risco in Model.NovosRiscos)
+        {
+            // Nota: Se você tiver um campo de Data/Hora de geração no seu Risco, use-o no lugar de DateTime.Now
+            <div class="notification-card risco">
+                <div class="notification-title">
+                    <i class="fas fa-exclamation-triangle notification-icon"></i> RISCO CRÍTICO GERADO
+                </div>
+                <div class="notification-message">
+                    O risco **@risco.Nome** (@risco.TipoRisco) atingiu o nível de criticidade: <b>@risco.NivelGravidade</b>.
+                </div>
+                <div class="notification-footer">
+                    <span class="notification-timestamp">Gerado em: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+
+                    <button type="button" class="btn-icon btn-ajax-modal" title="Ver Detalhes" data-id="@risco.Id"
+                        data-action-type="details" data-controller-url="@Url.Content("~/Riscos")"
+                        data-title="Detalhes de Risco #@risco.Id">
+                        Ver Risco
+                    </button>
+
+                </div>
+            </div>
+        }
+
+        // 3. ANÁLISES DE RISCO CONCLUÍDAS
+        @foreach (var analise in Model.AnalisesGeradas)
+        {
+            <div class="notification-card analise">
+                <div class="notification-title">
+                    <i class="fas fa-chart-line notification-icon"></i> ANÁLISE CONCLUÍDA
+                </div>
+                <div class="notification-message">
+                    A análise <b>@analise.Id</b> do risco <b>@analise.Risco?.Nome</b> foi concluída.
+                </div>
+                <div class="notification-footer">
+                    <span class="notification-timestamp">Concluída em @analise.DataAnalise.ToString("dd/MM/yyyy HH:mm")</span>
+
+                    <button type="button" class="btn-icon btn-ajax-modal" title="Ver Detalhes" data-id="@analise.Id"
+                        data-action-type="details" data-controller-url="@Url.Content("~/Analises")"
+                        data-title="Detalhes da Análise #@analise.Id">
+                        Ver Analise
+                    </button>
+
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<div id="ajax-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 id="modalTitle">Título</h5>
+            <button id="closeModalButton" type="button" class="btn-close" aria-label="Close">X</button>
+        </div>
+        <div id="modalBody" class="modal-body"> </div>
+    </div>
+</div>
+
+<div class="accordion" id="notificacoesAccordion">
+</div>
+
+@section Scripts {
+    <script src="/js/Partialjs.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+}

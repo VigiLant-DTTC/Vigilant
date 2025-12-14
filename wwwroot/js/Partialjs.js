@@ -179,6 +179,20 @@ document.querySelectorAll('[data-action-type="create-modal"]').forEach(button =>
     });
 });
 
+document.querySelectorAll('[data-action-type="aceitar-solicitacao-modal"]').forEach(button => {
+    button.addEventListener('click', function () {
+        const solicitacaoId = this.getAttribute('data-id');
+        const baseControllerUrl = this.getAttribute('data-controller-url');
+        const formId = this.getAttribute('data-form-id');
+        const title = this.getAttribute('data-title');
+
+        // URL aponta para o novo método no Controller de Notificações
+        const url = `${baseControllerUrl}/AbrirFormularioAceitarSolicitacao/${solicitacaoId}`;
+
+        loadPartialView(url, 'GET', title, formId);
+    });
+});
+
 // 2. Lógica para Botões de Ação na Tabela (EDITAR/DETALHES/EXCLUIR)
 // Selecionamos todos os botões com a classe de ação da modal para evitar problemas de delegação.
 document.querySelectorAll('.btn-ajax-modal').forEach(button => {
@@ -196,7 +210,12 @@ document.querySelectorAll('.btn-ajax-modal').forEach(button => {
         if (actionType === 'delete') {
             // Ação de Exclusão usa a Action "DeleteConfirmation" no Controller
             url = `${baseControllerUrl}/DeleteConfirmation/${id}`;
-        } else {
+        } else if (actionType === 'create-from-solicitacao') {
+             // Chama Colaboradores/Create com o ID da Solicitação como parâmetro de query string
+             url = `${baseControllerUrl}/Create?solicitacaoId=${id}`;
+             title = titleTemplate;
+        }
+        else {
             // Ações "Edit" e "Details" usam a Action com o mesmo nome
             url = `${baseControllerUrl}/${actionType}/${id}`;
         }

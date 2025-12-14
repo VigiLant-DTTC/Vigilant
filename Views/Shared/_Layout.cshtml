@@ -90,8 +90,8 @@
                             </li>
                             }
                             <li>
-                                <a href="@Url.Action("", "")"
-                                    class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "" ? "active" : "")">
+                                <a href="@Url.Action("Index", "Notificacoes")"
+                                    class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Notificacoes" ? "active" : "")">
                                     <i class="bx bx-bell menu-icon"></i>
                                     <span>Alertas</span>
                                 </a>

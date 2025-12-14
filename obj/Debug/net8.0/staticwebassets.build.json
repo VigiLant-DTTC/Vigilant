@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "IE7ribO4fJPaunmUZqKxoAnV6j02J0RFbLZ40WGMlMw=",
+  "Hash": "BGTyoIT+ekUjo9YyD0VVvxjIkb8nmdBQuCu8g7tlxzY=",
   "Source": "VigiLant",
   "BasePath": "_content/VigiLant",
   "Mode": "Default",
@@ -148,6 +148,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\iaanalysis.css"
+    },
+    {
+      "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\notificacoes.css",
+      "SourceId": "VigiLant",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\",
+      "BasePath": "_content/VigiLant",
+      "RelativePath": "css/notificacoes.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\notificacoes.css"
     },
     {
       "Identity": "E:\\Tiago\\Documents\\VigiLant\\wwwroot\\css\\site.css",

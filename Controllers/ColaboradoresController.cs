@@ -13,11 +13,13 @@ namespace VigiLant.Controllers
     {
         private readonly IColaboradorRepository _colaboradorRepository;
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly ISolicitacaoRepository _solicitacaoRepository;
 
-        public ColaboradoresController(IColaboradorRepository colaboradorRepository, IUsuarioRepository usuarioRepository)
+        public ColaboradoresController(IColaboradorRepository colaboradorRepository, IUsuarioRepository usuarioRepository, ISolicitacaoRepository solicitacaoRepository)
         {
             _colaboradorRepository = colaboradorRepository;
             _usuarioRepository = usuarioRepository;
+            _solicitacaoRepository = solicitacaoRepository;
         }
 
         // Helper para verificar se a requisição é AJAX
@@ -34,9 +36,27 @@ namespace VigiLant.Controllers
         }
 
         // GET: /Colaboradores/Create -> Retorna a Partial
-        public IActionResult Create()
+        public IActionResult Create(int? solicitacaoId)
         {
             var novoColaborador = new Colaborador { DataAdmissao = DateTime.Today };
+
+            var nomePreenchimento = TempData["NomeSolicitacao"] as string;
+            var emailPreenchimento = TempData["EmailSolicitacao"] as string;
+            
+            if (solicitacaoId.HasValue)
+            {
+                var solicitacao = _solicitacaoRepository.GetById(solicitacaoId.Value);
+
+                if (solicitacao != null && solicitacao.Status == VigiLant.Models.Enum.StatusSolicitacao.Pendente)
+                {
+                    // 2. Preenche o modelo Colaborador
+                    novoColaborador.Email = solicitacao.Email;
+                    novoColaborador.Nome = solicitacao.Nome;
+                    
+                    // 3. Passa o ID da Solicitação para a View para o POST
+                    ViewData["SolicitacaoId"] = solicitacao.Id;
+                }
+            }
 
             if (IsAjaxRequest())
             {
@@ -54,13 +74,28 @@ namespace VigiLant.Controllers
             {
                 _colaboradorRepository.Add(colaborador);
 
-                if (IsAjaxRequest()) { return Ok(); } // Sucesso AJAX
+                if (IsAjaxRequest()) 
+                { 
+                    // Retorna Ok com o TempData para ser exibido após o reload
+                    if (TempData["Sucesso"] != null)
+                    {
+                        return Ok(new { success = true, message = TempData["Sucesso"] });
+                    }
+                    return Ok(); 
+                } 
                 return RedirectToAction(nameof(Index));
             }
 
             if (IsAjaxRequest())
             {
                 Response.StatusCode = 400; // Erro de Validação
+
+                var solicitacaoIdValue = Request.Form["SolicitacaoId"];
+                if (!string.IsNullOrEmpty(solicitacaoIdValue))
+                {
+                     ViewData["SolicitacaoId"] = solicitacaoIdValue;
+                }
+
                 return PartialView("_CreateColaboradorPartial", colaborador);
             }
             return View(colaborador);
@@ -106,14 +141,14 @@ namespace VigiLant.Controllers
                 bool cargoAtualizadoParaUsuarioLogado = false;
 
                 // 2. Propaga a mudança de Cargo para o Usuário vinculado
-                if (colaborador.UsuarioId.HasValue) 
+                if (colaborador.UsuarioId.HasValue)
                 {
                     // Chama o método assíncrono para atualizar o cargo do usuário
                     await _usuarioRepository.UpdateCargo(colaborador.UsuarioId.Value, colaborador.Cargo); // [cite: 5]
-                    
+
                     // 3. Verifica se o usuário logado é o colaborador que teve o cargo alterado
                     var currentUserIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                    
+
                     if (currentUserIdClaim != null && int.TryParse(currentUserIdClaim.Value, out int userId) && userId == colaborador.UsuarioId.Value)
                     {
                         cargoAtualizadoParaUsuarioLogado = true;
@@ -121,17 +156,17 @@ namespace VigiLant.Controllers
                 }
 
                 if (IsAjaxRequest()) { return Ok(); }
-                
+
                 // 4. Se o usuário logado teve seu cargo alterado, força o logout e redireciona para o login com aviso.
                 if (cargoAtualizadoParaUsuarioLogado)
                 {
                     // Limpar o cookie de autenticação
                     await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                    
+
                     TempData["Sucesso"] = "Seu cargo foi atualizado. Por favor, faça login novamente para que o novo cargo seja aplicado.";
                     return RedirectToAction("Login", "Conta");
                 }
-                
+
                 return RedirectToAction(nameof(Index)); // [cite: 5]
             }
 

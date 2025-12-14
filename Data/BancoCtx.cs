@@ -24,6 +24,8 @@ namespace VigiLant.Data
         public DbSet<Relatorio> Relatorios { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Analise> Analises { get; set; }
+        public DbSet<Solicitacao> Solicitacoes { get; set; }
+
 
 
         public DbSet<AppConfig> AppConfigs { get; set; }
