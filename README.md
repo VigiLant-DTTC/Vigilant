@@ -113,7 +113,8 @@ API - `OpenAI` - Prevenções e soluções.
 CONEXÃO `BROKER-MQTTX` - Para conversa com sensores.
 
 ## Licença
-`Vigilant` ainda não possui licença.
+`Vigilant` possui licença **GNU General Public License v3.0**.
+[**Link da Licença Completa**](https://github.com/VigiLant-DTTC/Vigilant/blob/main/LICENSE)
 
 ---
 
