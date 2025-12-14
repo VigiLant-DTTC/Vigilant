@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VigiLant.Contratos;
 using VigiLant.Models;
+using VigiLant.Models.DTO;
 
 namespace VigiLant.Controllers;
 
@@ -18,7 +19,7 @@ public class HomeController : Controller
 
 
     public HomeController(ILogger<HomeController> logger, IEquipamentoRepository equipamentoR, IColaboradorRepository colaboradorR,
-    IRelatorioRepository relatorioR, IRiscoRepository riscoR, IAnaliseRepository analiseR) 
+    IRelatorioRepository relatorioR, IRiscoRepository riscoR, IAnaliseRepository analiseR)
     {
         _logger = logger;
         _equipamentoR = equipamentoR;
@@ -28,10 +29,37 @@ public class HomeController : Controller
         _analiseR = analiseR;
     }
 
+    private void CarregarEstatisticasDashboard()
+    {
+        var anoAtual = DateTime.Today.Year;
+        var riscosMensais = _riscoR.GetRiscosPorMesNoAno(anoAtual).ToList();
+
+        var dadosGrafico = Enumerable.Range(1, 12)
+            .Select(m => new RiscoMensalDTO { Mes = m, Contagem = 0 })
+            .ToList();
+
+        // Substitui os valores existentes
+        foreach (var dado in riscosMensais)
+        {
+            var index = dadosGrafico.FindIndex(d => d.Mes == dado.Mes);
+            if (index != -1)
+            {
+                dadosGrafico[index].Contagem = dado.Contagem;
+            }
+        }
+
+        // Passa a lista de contagens para a View (só os números)
+        ViewBag.RiscosMensais = dadosGrafico.Select(d => d.Contagem).ToList();
+
+        ViewBag.MaxAnalisesGeradas = 10;
+    }
+
+
     public IActionResult Index()
     {
+        CarregarEstatisticasDashboard();
 
-        var todasAnalises = _analiseR.GetAll().ToList(); 
+        var todasAnalises = _analiseR.GetAll().ToList();
         var totalAnalises = todasAnalises.Count();
 
         var totalRiscos = _riscoR.GetAll().Count();
@@ -42,7 +70,7 @@ public class HomeController : Controller
 
         var totalColaboradores = _colaboradorR.GetAll().Count();
 
-        ViewBag.TotalRiscos = totalRiscos.ToString(); 
+        ViewBag.TotalRiscos = totalRiscos.ToString();
         ViewBag.TotalEquipamentos = totalEquipamentos.ToString();
         ViewBag.TotalRelatorios = totalRelatorios.ToString();
         ViewBag.TotalColaboradores = totalColaboradores.ToString();
@@ -56,6 +84,8 @@ public class HomeController : Controller
 
         return View();
     }
+
+
 
 }
 

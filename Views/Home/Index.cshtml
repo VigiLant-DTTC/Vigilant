@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Newtonsoft.Json
+@{
     ViewData["Title"] = "Dashboard";
 }
 
@@ -157,4 +158,65 @@
 @section Scripts {
     <script src="/js/Partialjs.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script>
+        function getRiscosData() {
+            try {
+                var data = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.RiscosMensais ?? new List<int>()));
+
+                while (data.length < 12) {
+                    data.push(0);
+                }
+                return data;
+            } catch (e) {
+                console.error("Erro ao serializar ViewBag.RiscosMensais:", e);
+                return Array(12).fill(0); // Retorna 12 zeros em caso de erro.
+            }
+        }
+        
+        var riscosMensaisData = getRiscosData();
+
+        // Nomes dos meses (Labels)
+        var labels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        
+        // 1. Substitui o placeholder pela tag <canvas>
+        var chartPlaceholder = document.querySelector('.chart-placeholder');
+        if (chartPlaceholder) {
+            // Remove os divs de placeholder existentes 
+            chartPlaceholder.innerHTML = '<canvas id="risksChart"></canvas>';
+        }
+
+        // 2. Inicializa o Chart.js
+        const ctx = document.getElementById('risksChart').getContext('2d');
+        const risksChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Riscos Identificados',
+                    data: riscosMensaisData, // Usa os dados do C#
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, 
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        // Garante que o eixo Y exiba apenas números inteiros
+                        ticks: {
+                            callback: function(value) { if (value % 1 === 0) { return value; } }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
 }

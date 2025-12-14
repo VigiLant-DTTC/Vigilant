@@ -5,6 +5,7 @@ namespace VigiLant.Contratos
     public interface IRiscoRepository
     {
         IEnumerable<Risco> GetAll();
+        IEnumerable<VigiLant.Models.DTO.RiscoMensalDTO> GetRiscosPorMesNoAno(int ano);
 
         Risco GetById(int id);
 

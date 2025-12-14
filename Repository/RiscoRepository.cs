@@ -2,7 +2,8 @@ using VigiLant.Contratos;
 using VigiLant.Models;
 using VigiLant.Data; // Adicione este using para o seu DbContext
 using Microsoft.EntityFrameworkCore; // Para usar métodos do EF Core
-using System.Linq; // Para usar métodos LINQ (OrderBy, Select)
+using System.Linq;
+using VigiLant.Models.DTO; // Para usar métodos LINQ (OrderBy, Select)
 
 namespace VigiLant.Repository
 {
@@ -44,7 +45,21 @@ namespace VigiLant.Repository
             // 3. Se não houver buracos (Ex: 1, 2, 3), retorna o próximo sequencial
             return nextId;
         }
-        // =================================================================
+        
+        public IEnumerable<RiscoMensalDTO> GetRiscosPorMesNoAno(int ano)
+        {
+            // Filtra os riscos pelo ano atual e agrupa pela propriedade Month
+            return _context.Riscos
+                .Where(r => r.DataIdentificacao.Year == ano)
+                .GroupBy(r => r.DataIdentificacao.Month)
+                .Select(g => new RiscoMensalDTO
+                {
+                    Mes = g.Key,
+                    Contagem = g.Count()
+                })
+                .OrderBy(d => d.Mes)
+                .ToList();
+        }
 
         public IEnumerable<Risco> GetAll()
         {
