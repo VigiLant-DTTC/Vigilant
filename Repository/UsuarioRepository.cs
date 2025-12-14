@@ -39,5 +39,16 @@ namespace VigiLant.Repository
                 await _context.SaveChangesAsync();
             }
         }
+
+
+        public async Task Delete(int usuarioId)
+        {
+            var usuario = await _context.Usuarios.FindAsync(usuarioId);
+            if (usuario != null)
+            {
+                _context.Usuarios.Remove(usuario);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

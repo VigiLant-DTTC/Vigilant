@@ -42,7 +42,7 @@ namespace VigiLant.Controllers
 
             var nomePreenchimento = TempData["NomeSolicitacao"] as string;
             var emailPreenchimento = TempData["EmailSolicitacao"] as string;
-            
+
             if (solicitacaoId.HasValue)
             {
                 var solicitacao = _solicitacaoRepository.GetById(solicitacaoId.Value);
@@ -52,7 +52,7 @@ namespace VigiLant.Controllers
                     // 2. Preenche o modelo Colaborador
                     novoColaborador.Email = solicitacao.Email;
                     novoColaborador.Nome = solicitacao.Nome;
-                    
+
                     // 3. Passa o ID da Solicitação para a View para o POST
                     ViewData["SolicitacaoId"] = solicitacao.Id;
                 }
@@ -74,15 +74,15 @@ namespace VigiLant.Controllers
             {
                 _colaboradorRepository.Add(colaborador);
 
-                if (IsAjaxRequest()) 
-                { 
+                if (IsAjaxRequest())
+                {
                     // Retorna Ok com o TempData para ser exibido após o reload
                     if (TempData["Sucesso"] != null)
                     {
                         return Ok(new { success = true, message = TempData["Sucesso"] });
                     }
-                    return Ok(); 
-                } 
+                    return Ok();
+                }
                 return RedirectToAction(nameof(Index));
             }
 
@@ -93,7 +93,7 @@ namespace VigiLant.Controllers
                 var solicitacaoIdValue = Request.Form["SolicitacaoId"];
                 if (!string.IsNullOrEmpty(solicitacaoIdValue))
                 {
-                     ViewData["SolicitacaoId"] = solicitacaoIdValue;
+                    ViewData["SolicitacaoId"] = solicitacaoIdValue;
                 }
 
                 return PartialView("_CreateColaboradorPartial", colaborador);
@@ -194,9 +194,21 @@ namespace VigiLant.Controllers
         // POST: /Colaboradores/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            _colaboradorRepository.Delete(id);
+            var colaborador = _colaboradorRepository.GetById(id);
+
+            if (colaborador != null)
+            {
+                // 1. Verificar se há um Usuario vinculado
+                if (colaborador.UsuarioId.HasValue)
+                {
+                    await _usuarioRepository.Delete(colaborador.UsuarioId.Value);
+                }
+
+                // 3. Excluir o Colaborador
+                _colaboradorRepository.Delete(id);
+            }
 
             if (IsAjaxRequest()) { return Ok(); } // Sucesso AJAX
             return RedirectToAction(nameof(Index));

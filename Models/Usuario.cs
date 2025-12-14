@@ -12,7 +12,6 @@ namespace VigiLant.Models
         public string Email { get; set; }
 
         public string SenhaHash { get; set; }
-
         public Cargo cargo { get; set; } 
     }
 }

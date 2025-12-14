@@ -5,13 +5,14 @@
 }
 
 <link rel="stylesheet" href="/css/notificacoes.css" asp-append-version="true" />
-
-<div class="page-header">
-    <h1 class="page-title">Notificações</h1>
-    <div class="breadcrumb">
-        <a href="@Url.Action("Index", "Home")">Dashboard</a>
-        <span class="separator">/</span>
-        <span class="active">Notificações</span>
+<div class="PageFlex">
+    <div class="page-header">
+        <h1 class="page-title">Notificações</h1>
+        <div class="breadcrumb">
+            <a href="@Url.Action("Index", "Home")">Dashboard</a>
+            <span class="separator">/</span>
+            <span class="active">Notificações</span>
+        </div>
     </div>
 </div>
 
@@ -56,14 +57,10 @@
                     <span class="notification-timestamp">Aguardando desde
                         @solicitacao.DataSolicitacao.ToString("dd/MM/yyyy")</span>
 
-                    <button type="button" class="btn-icon btn-ajax-modal" 
-                        title="Aceitar e Criar Colaborador" 
-                        data-id="@solicitacao.Id"
-                        data-form-id="colaboradorForm" 
-                        data-action-type="create-from-solicitacao" 
-                        data-controller-url="@Url.Content("~/Colaboradores")" 
-                        data-title="Criar Colaborador com Solicitação">
-                         <i class="fas fa-check"></i> Aceitar e Analisar
+                    <button type="button" class="btn-icon btn-ajax-modal" title="Aceitar e Criar Colaborador"
+                        data-id="@solicitacao.Id" data-form-id="colaboradorForm" data-action-type="create-from-solicitacao"
+                        data-controller-url="@Url.Content("~/Colaboradores")" data-title="Criar Colaborador com Solicitação">
+                        <i class="fas fa-check"></i> Aceitar e Analisar
                     </button>
 
                 </div>

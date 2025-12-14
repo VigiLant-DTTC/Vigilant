@@ -76,7 +76,7 @@ namespace VigiLant.Controllers
             TempData["NomeSolicitacao"] = solicitacao.Nome;
             TempData["EmailSolicitacao"] = solicitacao.Email;
             TempData["SolicitacaoId"] = solicitacao.Id;
-
+            
             return RedirectToAction("Create", "Colaboradores");
         }
 
